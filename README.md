@@ -1,3 +1,12 @@
+###################################################################
+# High Performance Conjugate Gradient Benchmark (HPCG) using SyCL #
+###################################################################
+
+A SyCL port of HPCG, using DPC++ compiler. 
+
+The implementation will change the OpenMP kernels to SyCL kernels.
+
+
 ########################################################
 # High Performance Conjugate Gradient Benchmark (HPCG) #
 ########################################################
