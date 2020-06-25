@@ -41,10 +41,12 @@ typedef struct CGData_STRUCT CGData;
 inline void InitializeSparseCGData(SparseMatrix & A, CGData & data) {
   local_int_t nrow = A.localNumberOfRows;
   local_int_t ncol = A.localNumberOfColumns;
-  InitializeVector(data.r, nrow);
-  InitializeVector(data.z, ncol);
-  InitializeVector(data.p, ncol);
-  InitializeVector(data.Ap, nrow);
+  int padValue=(64-ncol%64)*(ncol%64!=0);
+
+  InitializeVector(data.r, nrow,nrow+(64-nrow%64)*(nrow%64!=0));
+  InitializeVector(data.z, ncol,ncol+padValue);
+  InitializeVector(data.p, ncol,ncol+padValue);
+  InitializeVector(data.Ap, nrow,nrow+(64-nrow%64)*(nrow%64!=0));
   return;
 }
 

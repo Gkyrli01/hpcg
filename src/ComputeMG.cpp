@@ -20,6 +20,7 @@
 
 #include "ComputeMG.hpp"
 #include "ComputeMG_ref.hpp"
+#include "ComputeMG_SyCL.hpp"
 
 /*!
   @param[in] A the known system matrix
@@ -33,6 +34,6 @@
 int ComputeMG(const SparseMatrix  & A, const Vector & r, Vector & x) {
 
   // This line and the next two lines should be removed and your version of ComputeSYMGS should be used.
-  A.isMgOptimized = false;
-  return ComputeMG_ref(A, r, x);
+//  A.isMgOptimized = false;
+  return ComputeMG_SyCL(A, r, x);
 }

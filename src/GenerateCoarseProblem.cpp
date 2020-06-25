@@ -19,7 +19,9 @@
  */
 
 #ifndef HPCG_NO_OPENMP
+
 #include <omp.h>
+
 #endif
 
 #include <cassert>
@@ -38,74 +40,83 @@
 
 */
 
-void GenerateCoarseProblem(const SparseMatrix & Af) {
+void GenerateCoarseProblem(const SparseMatrix &Af) {
 
-  // Make local copies of geometry information.  Use global_int_t since the RHS products in the calculations
-  // below may result in global range values.
-  global_int_t nxf = Af.geom->nx;
-  global_int_t nyf = Af.geom->ny;
-  global_int_t nzf = Af.geom->nz;
+	// Make local copies of geometry information.  Use global_int_t since the RHS products in the calculations
+	// below may result in global range values.
+	global_int_t nxf = Af.geom->nx;
+	global_int_t nyf = Af.geom->ny;
+	global_int_t nzf = Af.geom->nz;
 
-  local_int_t nxc, nyc, nzc; //Coarse nx, ny, nz
-  assert(nxf%2==0); assert(nyf%2==0); assert(nzf%2==0); // Need fine grid dimensions to be divisible by 2
-  nxc = nxf/2; nyc = nyf/2; nzc = nzf/2;
-  local_int_t * f2cOperator = new local_int_t[Af.localNumberOfRows];
-  local_int_t localNumberOfRows = nxc*nyc*nzc; // This is the size of our subblock
-  // If this assert fails, it most likely means that the local_int_t is set to int and should be set to long long
-  assert(localNumberOfRows>0); // Throw an exception of the number of rows is less than zero (can happen if "int" overflows)
+	local_int_t nxc, nyc, nzc; //Coarse nx, ny, nz
+	assert(nxf % 2 == 0);
+	assert(nyf % 2 == 0);
+	assert(nzf % 2 == 0); // Need fine grid dimensions to be divisible by 2
+	nxc = nxf / 2;
+	nyc = nyf / 2;
+	nzc = nzf / 2;
+	local_int_t *f2cOperator = new local_int_t[Af.localNumberOfRows];
+	local_int_t localNumberOfRows = nxc * nyc * nzc; // This is the size of our subblock
+	// If this assert fails, it most likely means that the local_int_t is set to int and should be set to long long
+	assert(localNumberOfRows >
+		   0); // Throw an exception of the number of rows is less than zero (can happen if "int" overflows)
 
-  // Use a parallel loop to do initial assignment:
-  // distributes the physical placement of arrays of pointers across the memory system
+	// Use a parallel loop to do initial assignment:
+	// distributes the physical placement of arrays of pointers across the memory system
 #ifndef HPCG_NO_OPENMP
-  #pragma omp parallel for
+#pragma omp parallel for
 #endif
-  for (local_int_t i=0; i< localNumberOfRows; ++i) {
-    f2cOperator[i] = 0;
-  }
+	for (local_int_t i = 0; i < localNumberOfRows; ++i) {
+		f2cOperator[i] = 0;
+	}
 
 
-  // TODO:  This triply nested loop could be flattened or use nested parallelism
+	// TODO:  This triply nested loop could be flattened or use nested parallelism
 #ifndef HPCG_NO_OPENMP
-  #pragma omp parallel for
+#pragma omp parallel for
 #endif
-  for (local_int_t izc=0; izc<nzc; ++izc) {
-    local_int_t izf = 2*izc;
-    for (local_int_t iyc=0; iyc<nyc; ++iyc) {
-      local_int_t iyf = 2*iyc;
-      for (local_int_t ixc=0; ixc<nxc; ++ixc) {
-        local_int_t ixf = 2*ixc;
-        local_int_t currentCoarseRow = izc*nxc*nyc+iyc*nxc+ixc;
-        local_int_t currentFineRow = izf*nxf*nyf+iyf*nxf+ixf;
-        f2cOperator[currentCoarseRow] = currentFineRow;
-      } // end iy loop
-    } // end even iz if statement
-  } // end iz loop
+	for (local_int_t izc = 0; izc < nzc; ++izc) {
+		local_int_t izf = 2 * izc;
+		for (local_int_t iyc = 0; iyc < nyc; ++iyc) {
+			local_int_t iyf = 2 * iyc;
+			for (local_int_t ixc = 0; ixc < nxc; ++ixc) {
+				local_int_t ixf = 2 * ixc;
+				local_int_t currentCoarseRow = izc * nxc * nyc + iyc * nxc + ixc;
+				local_int_t currentFineRow = izf * nxf * nyf + iyf * nxf + ixf;
+				f2cOperator[currentCoarseRow] = currentFineRow;
+			} // end iy loop
+		} // end even iz if statement
+	} // end iz loop
 
-  // Construct the geometry and linear system
-  Geometry * geomc = new Geometry;
-  local_int_t zlc = 0; // Coarsen nz for the lower block in the z processor dimension
-  local_int_t zuc = 0; // Coarsen nz for the upper block in the z processor dimension
-  int pz = Af.geom->pz;
-  if (pz>0) {
-    zlc = Af.geom->partz_nz[0]/2; // Coarsen nz for the lower block in the z processor dimension
-    zuc = Af.geom->partz_nz[1]/2; // Coarsen nz for the upper block in the z processor dimension
-  }
-  GenerateGeometry(Af.geom->size, Af.geom->rank, Af.geom->numThreads, Af.geom->pz, zlc, zuc, nxc, nyc, nzc, Af.geom->npx, Af.geom->npy, Af.geom->npz, geomc);
+	// Construct the geometry and linear system
+	Geometry *geomc = new Geometry;
+	local_int_t zlc = 0; // Coarsen nz for the lower block in the z processor dimension
+	local_int_t zuc = 0; // Coarsen nz for the upper block in the z processor dimension
+	int pz = Af.geom->pz;
+	if (pz > 0) {
+		zlc = Af.geom->partz_nz[0] / 2; // Coarsen nz for the lower block in the z processor dimension
+		zuc = Af.geom->partz_nz[1] / 2; // Coarsen nz for the upper block in the z processor dimension
+	}
+	GenerateGeometry(Af.geom->size, Af.geom->rank, Af.geom->numThreads, Af.geom->pz, zlc, zuc, nxc, nyc, nzc,
+					 Af.geom->npx, Af.geom->npy, Af.geom->npz, geomc);
 
-  SparseMatrix * Ac = new SparseMatrix;
-  InitializeSparseMatrix(*Ac, geomc);
-  GenerateProblem(*Ac, 0, 0, 0);
-  SetupHalo(*Ac);
-  Vector *rc = new Vector;
-  Vector *xc = new Vector;
-  Vector * Axf = new Vector;
-  InitializeVector(*rc, Ac->localNumberOfRows);
-  InitializeVector(*xc, Ac->localNumberOfColumns);
-  InitializeVector(*Axf, Af.localNumberOfColumns);
-  Af.Ac = Ac;
-  MGData * mgData = new MGData;
-  InitializeMGData(f2cOperator, rc, xc, Axf, *mgData);
-  Af.mgData = mgData;
+	SparseMatrix *Ac = new SparseMatrix;
+	InitializeSparseMatrix(*Ac, geomc);
+	GenerateProblem(*Ac, 0, 0, 0);
+	SetupHalo(*Ac);
+	Vector *rc = new Vector;
+	Vector *xc = new Vector;
+	Vector *Axf = new Vector;
+	int padValue1 = (64 - Ac->localNumberOfColumns % 64) * (Ac->localNumberOfColumns % 64 != 0);
+	int padValue2 = (64 - Af.localNumberOfColumns % 64) * (Af.localNumberOfColumns % 64 != 0);
+	InitializeVector(*rc, Ac->localNumberOfRows,
+					 Ac->localNumberOfRows + (64 - Ac->localNumberOfRows % 64) * (Ac->localNumberOfRows % 64 != 0));
+	InitializeVector(*xc, Ac->localNumberOfColumns, Ac->localNumberOfColumns+padValue1);
+	InitializeVector(*Axf, Af.localNumberOfColumns, Af.localNumberOfColumns+padValue2);
+	Af.Ac = Ac;
+	MGData *mgData = new MGData;
+	InitializeMGData(f2cOperator, rc, xc, Axf, *mgData);
+	Af.mgData = mgData;
 
-  return;
+	return;
 }

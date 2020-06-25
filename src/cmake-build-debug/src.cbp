@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="src"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="src">
+				<Option output="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/src" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/."/>
+					<Add directory="/usr/include/c++/8"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/8"/>
+					<Add directory="/usr/include/c++/8/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/8/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/Makefile&quot;  VERBOSE=1 src"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="src/fast">
+				<Option output="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/src" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/."/>
+					<Add directory="/usr/include/c++/8"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/8"/>
+					<Add directory="/usr/include/c++/8/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/8/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/8/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/Makefile&quot;  VERBOSE=1 src/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/CG.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/CG.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/CGData.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/CG_ref.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/CG_ref.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/CheckAspectRatio.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/CheckAspectRatio.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/CheckProblem.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/CheckProblem.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeDotProduct.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeDotProduct.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeDotProduct_ref.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeDotProduct_ref.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeMG.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeMG.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeMG_ref.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeMG_ref.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeOptimalShapeXYZ.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeOptimalShapeXYZ.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeProlongation_ref.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeProlongation_ref.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeResidual.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeResidual.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeRestriction_ref.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeRestriction_ref.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeSPMV.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeSPMV.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeSPMV_ref.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeSPMV_ref.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeSYMGS.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeSYMGS.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeSYMGS_ref.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeSYMGS_ref.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeWAXPBY.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeWAXPBY.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeWAXPBY_ref.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ComputeWAXPBY_ref.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ExchangeHalo.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ExchangeHalo.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/GenerateCoarseProblem.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/GenerateCoarseProblem.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/GenerateGeometry.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/GenerateGeometry.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/GenerateProblem.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/GenerateProblem.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/GenerateProblem_ref.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/GenerateProblem_ref.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/Geometry.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/MGData.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/MixedBaseCounter.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/MixedBaseCounter.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/OptimizeProblem.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/OptimizeProblem.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/OutputFile.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/OutputFile.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ReadHpcgDat.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ReadHpcgDat.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ReportResults.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/ReportResults.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/SetupHalo.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/SetupHalo.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/SetupHalo_ref.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/SetupHalo_ref.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/SparseMatrix.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/TestCG.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/TestCG.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/TestNorms.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/TestNorms.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/TestSymmetry.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/TestSymmetry.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/Vector.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/WriteProblem.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/WriteProblem.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/YAML_Doc.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/YAML_Doc.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/YAML_Element.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/YAML_Element.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/finalize.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/hpcg.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/init.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/main.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/mytimer.cpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/mytimer.hpp">
+			<Option target="src"/>
+		</Unit>
+		<Unit filename="/home/kyrlitsias/Desktop/Dissertation/Hpcg/hpcg/src/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

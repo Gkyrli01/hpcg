@@ -20,6 +20,7 @@
 
 #include "ComputeSYMGS.hpp"
 #include "ComputeSYMGS_ref.hpp"
+#include "ComputeSYMGS_SyCL.hpp"
 
 /*!
   Routine to compute one step of symmetric Gauss-Seidel:
@@ -49,7 +50,11 @@
 */
 int ComputeSYMGS( const SparseMatrix & A, const Vector & r, Vector & x) {
 
-  // This line and the next two lines should be removed and your version of ComputeSYMGS should be used.
-  return ComputeSYMGS_ref(A, r, x);
+#if defined(SyCL_SYMGS)
+	return ComputeSYMGS_SyCL(A, r, x);
+#else
+	return ComputeSYMGS_ref(A, r, x);
+#endif
+
 
 }
