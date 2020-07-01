@@ -20,8 +20,9 @@ extern sycl::queue queue;
 
 extern BufferFactory bufferFactory;
 extern BufferFactory dotFactory;
-
+extern bool doAccess;
 extern std::map<int, double *> dotProductArrays;
+extern bool dotAccess;
 
 
 

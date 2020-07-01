@@ -234,7 +234,9 @@ int main(int argc, char *argv[]) {
 
 	std::cout << "1" << A.matrixValues[0][0] << std::endl;
 	t7 = mytimer() - t7;
-	times[7] = t7;
+//	times[7] = t7;
+	times[7] = 0;//Temporarily remove optimization overhead
+
 #ifdef HPCG_DEBUG
 	if (rank==0) HPCG_fout << "Total problem setup time in main (sec) = " << mytimer() - t1 << endl;
 #endif
@@ -355,7 +357,7 @@ int main(int argc, char *argv[]) {
 	testnorms_data.values = new double[numberOfCgSets];
 	SyncBuffers();
 	std::cout << "10" << A.matrixValues[0][0] << std::endl;
-
+	doAccess= false;
 	for (int i = 0; i < numberOfCgSets; ++i) {
 		ZeroVector(x); // Zero out x
 		ierr = CG(A, data, b, x, optMaxIters, optTolerance, niters, normr, normr0, &times[0], true);
@@ -363,7 +365,7 @@ int main(int argc, char *argv[]) {
 		if (rank == 0) HPCG_fout << "Call [" << i << "] Scaled Residual [" << normr / normr0 << "]" << endl;
 		testnorms_data.values[i] = normr / normr0; // Record scaled residual from this run
 	}
-	SyncBuffers();
+//	SyncBuffers();
 
 	std::cout << "11" << A.matrixValues[0][0] << std::endl;
 

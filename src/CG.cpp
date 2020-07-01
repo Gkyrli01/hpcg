@@ -45,7 +45,7 @@ void SyCLCopyVector(Vector_STRUCT &x, Vector_STRUCT &to) {
 		queue.submit([&](sycl::handler &cgh) {
 			auto to_acc = to_buf.get_access<sycl::access::mode::write>(cgh);
 			auto x_acc = x_buf.get_access<sycl::access::mode::read>(cgh);
-			cgh.parallel_for<class prolongation>(
+			cgh.parallel_for<class copy>(
 					sycl::nd_range<1>(size, 32),
 					[=](sycl::nd_item<1> item) {
 						size_t i = item.get_global_linear_id();
@@ -57,6 +57,24 @@ void SyCLCopyVector(Vector_STRUCT &x, Vector_STRUCT &to) {
 	auto access = to_buf.get_access<sycl::access::mode::read>();
 }
 
+void SyCLZeroVector1(Vector_STRUCT &x){
+	local_int_t size=x.paddedLength;
+	auto x_buf=*bufferFactory.GetBuffer(x.values,sycl::range<1>(x.paddedLength));
+	{
+
+		queue.submit([&](sycl::handler &cgh) {
+			auto x_acc = x_buf.get_access<sycl::access::mode::write>(cgh);
+			cgh.parallel_for<class zero>(
+					sycl::nd_range<1>(size, 32),
+					[=](sycl::nd_item<1> item) {
+						size_t i=item.get_global_linear_id();
+						if(i<size)
+							x_acc[i] =0;
+					});
+		});
+	}
+	x_buf.get_access<sycl::access::mode::read>();
+}
 
 /*!
   Routine to compute an approximate solution to Ax = b
@@ -82,7 +100,11 @@ int CG(const SparseMatrix &A, CGData &data, const Vector &b, Vector &x,
 	   const int max_iter, const double tolerance, int &niters, double &normr, double &normr0,
 	   double *times, bool doPreconditioning) {
 
-	SyncBuffers();
+	if(doAccess)
+		SyncBuffers();
+	else{
+		SyCLZeroVector1(x);
+	}
 	double t_begin = mytimer();  // Start timing right away
 	normr = 0.0;
 	double rtz = 0.0, oldrtz = 0.0, alpha = 0.0, beta = 0.0, pAp = 0.0;
@@ -126,11 +148,13 @@ int CG(const SparseMatrix &A, CGData &data, const Vector &b, Vector &x,
 	normr0 = normr;
 
 	// Start iterations
-
+	bool didMG= false;
 	for (int k = 1; k <= max_iter && normr / normr0 > tolerance; k++) {
 		TICK();
-		if (doPreconditioning)
-			ComputeMG(A, r, z); // Apply preconditioner
+		if (doPreconditioning) {
+			if(!didMG)
+				ComputeMG(A, r, z); // Apply preconditioner
+		}
 		else
 			SyCLCopyVector(r, z); // copy r to z (no preconditioning)
 		TOCK(t5); // Preconditioner apply time
@@ -165,7 +189,16 @@ int CG(const SparseMatrix &A, CGData &data, const Vector &b, Vector &x,
 		ComputeWAXPBY(nrow, 1.0, r, -alpha, Ap, r, A.isWaxpbyOptimized);
 		TOCK(t2);// r = r - alpha*Ap
 		TICK();
+		if(!dotAccess)
+			dotAccess= false;
 		ComputeDotProduct(nrow, r, r, normr, t4, A.isDotProductOptimized);
+		dotAccess= true;
+
+		if (doPreconditioning&&!doAccess) {
+			ComputeMG(A, r, z); // Apply preconditioner
+			didMG=true;
+			normr=((*dotFactory.GetBuffer(dotProductArrays[1],sycl::range<1>(1))).get_access<sycl::access::mode::read>())[0];
+		}
 		TOCK(t1);
 		normr = sqrt(normr);
 #ifdef HPCG_DEBUG

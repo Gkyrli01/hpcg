@@ -210,9 +210,7 @@ int ComputeDotProduct_SyCL(const local_int_t n, const Vector &x, const Vector &y
 	double local_result = 0.0;
 	double *xv = x.values;
 	double *yv = y.values;
-	std::cout << n << std::endl;
-	std::cout << x.paddedLength << std::endl;
-	std::cout << y.paddedLength << std::endl;
+
 
 //	sycl::buffer<double, 1> x_buf(x.values, sycl::range<1>(x.paddedLength));
 //	sycl::buffer<double, 1> y_buf(y.values, sycl::range<1>(x.paddedLength));
@@ -232,9 +230,12 @@ int ComputeDotProduct_SyCL(const local_int_t n, const Vector &x, const Vector &y
 		if (n_wgroups != 1) {
 			newLength = n_wgroups;
 			ReturnArrayWithPad(output, &newLength, part_size);
-
 		} else {
-			output = new double[1];
+			if(dotProductArrays.find(1) == dotProductArrays.end()) {
+				output = new double[1];
+				dotProductArrays.insert(std::pair<int,double *>(1,output));
+			}
+			output=dotProductArrays[1];
 			newLength = 1;
 		}
 		auto result1=*dotFactory.GetBuffer(output, sycl::range<1>(newLength));
@@ -252,34 +253,36 @@ int ComputeDotProduct_SyCL(const local_int_t n, const Vector &x, const Vector &y
 		x_buf = *dotFactory.GetBuffer(output, sycl::range<1>(newLength));
 		len = newLength;
 	}
-	auto access = x_buf.get_access<sycl::access::mode::read>();
-	local_result = access[0];
-
-//	if (yv == xv) {
-//#ifndef HPCG_NO_OPENMP
-//#pragma omp parallel for reduction (+:local_result)
-//#endif
-//		for (local_int_t i = 0; i < n; i++) local_result += xv[i] * xv[i];
-//	} else {
-//#ifndef HPCG_NO_OPENMP
-//#pragma omp parallel for reduction (+:local_result)
-//#endif
-//		for (local_int_t i = 0; i < n; i++) local_result += xv[i] * yv[i];
-//	}
+	if(dotAccess){
+		auto access = x_buf.get_access<sycl::access::mode::read>();
+		result = access[0];
+	}
 //
-
-#ifndef HPCG_NO_MPI
-	// Use MPI's reduce function to collect all partial sums
-	double t0 = mytimer();
-	double global_result = 0.0;
-	MPI_Allreduce(&local_result, &global_result, 1, MPI_DOUBLE, MPI_SUM,
-				  MPI_COMM_WORLD);
-	result = global_result;
-	time_allreduce += mytimer() - t0;
-#else
-	time_allreduce += 0.0;
-	result = local_result;
-#endif
+////	if (yv == xv) {
+////#ifndef HPCG_NO_OPENMP
+////#pragma omp parallel for reduction (+:local_result)
+////#endif
+////		for (local_int_t i = 0; i < n; i++) local_result += xv[i] * xv[i];
+////	} else {
+////#ifndef HPCG_NO_OPENMP
+////#pragma omp parallel for reduction (+:local_result)
+////#endif
+////		for (local_int_t i = 0; i < n; i++) local_result += xv[i] * yv[i];
+////	}
+////
+//
+//#ifndef HPCG_NO_MPI
+//	// Use MPI's reduce function to collect all partial sums
+//	double t0 = mytimer();
+//	double global_result = 0.0;
+//	MPI_Allreduce(&local_result, &global_result, 1, MPI_DOUBLE, MPI_SUM,
+//				  MPI_COMM_WORLD);
+//	result = global_result;
+//	time_allreduce += mytimer() - t0;
+//#else
+//	time_allreduce += 0.0;
+//	result = local_result;
+//#endif
 
 	return 0;
 }

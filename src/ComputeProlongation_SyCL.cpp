@@ -19,6 +19,7 @@
  */
 //#include <CL/sycl.hpp>
 #include "SyCLResources.h"
+
 #ifndef HPCG_NO_OPENMP
 
 #include <omp.h>
@@ -47,9 +48,9 @@ int ComputeProlongation_SyCL(const SparseMatrix &Af, Vector &xf) {
 	local_int_t *f2c = Af.mgData->f2cOperator;
 	local_int_t nc = Af.mgData->rc->localLength;
 
-	auto xfv_buf=*bufferFactory.GetBuffer(xfv, sycl::range<1>(xf.paddedLength));
-	auto xcv_buf=*bufferFactory.GetBuffer(xcv, sycl::range<1>(Af.mgData->xc->paddedLength));
-	auto f2c_buf=*bufferFactory.GetBuffer(f2c, sycl::range<1>(nc));
+	auto xfv_buf = *bufferFactory.GetBuffer(xfv, sycl::range<1>(xf.paddedLength));
+	auto xcv_buf = *bufferFactory.GetBuffer(xcv, sycl::range<1>(Af.mgData->xc->paddedLength));
+	auto f2c_buf = *bufferFactory.GetBuffer(f2c, sycl::range<1>(nc));
 	{
 		queue.submit([&](sycl::handler &cgh) {
 			auto xfv_acc = xfv_buf.get_access<sycl::access::mode::write>(cgh);
@@ -59,12 +60,13 @@ int ComputeProlongation_SyCL(const SparseMatrix &Af, Vector &xf) {
 					sycl::nd_range<1>(nc, 32),
 					[=](sycl::nd_item<1> item) {
 						int id = item.get_global_linear_id();
-						if(id<nc)
+//						if (id < nc)
 							xfv_acc[f2c_acc[id]] += xcv_acc[id];
 					});
 		});
 	}
-	auto access = xfv_buf.get_access<sycl::access::mode::read>();
+	if (doAccess)
+		auto access = xfv_buf.get_access<sycl::access::mode::read>();
 
 	return 0;
 }

@@ -213,13 +213,15 @@ int ComputeSYMGS_SyCL(const SparseMatrix &A, const Vector &r, Vector &x) {
 							}
 						});
 			});
-			queue.wait();
+//			queue.wait();
 		}
 	}
 //	BufferFactory sth;
 
 //	bufferFactory.GetBuffer(A.mtxIndL,sycl::range<1>(A.localNumberOfRows));
-	auto access = xv_buf.get_access<sycl::access::mode::read>();
+	if (doAccess)
+		auto access = xv_buf.get_access<sycl::access::mode::read>();
+
 //
 //	std::cout << access[0]<<" | "<< matrixDiagonal[0]<<" | "<<A.matrixDiagonal[0][0]<<" | "<<A.matrixValues[0][0] << std::endl;
 //	if(nrow==1124864)

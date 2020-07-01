@@ -91,17 +91,17 @@ int ComputeWAXPBY_SyCL(const local_int_t n, const double alpha, const Vector &x,
 
 			auto kernelNoAlpha = [=](sycl::nd_item<1> item) {
 				int i = item.get_global_linear_id();
-				if (i < n)
+//				if (i < n)
 					wv_acc[i] = xv_acc[i] + beta * yv_acc[i];
 			};
 			auto kernelNoBeta = [=](sycl::nd_item<1> item) {
 				int i = item.get_global_linear_id();
-				if (i < n)
+//				if (i < n)
 					wv_acc[i] = alpha * xv_acc[i] + yv_acc[i];
 			};
 			auto kernelBoth = [=](sycl::nd_item<1> item) {
 				int i = item.get_global_linear_id();
-				if (i < n)
+//				if (i < n)
 					wv_acc[i] = alpha * xv_acc[i] + beta * yv_acc[i];
 			};
 			if (alpha == 1.0)
@@ -115,7 +115,8 @@ int ComputeWAXPBY_SyCL(const local_int_t n, const double alpha, const Vector &x,
 						sycl::nd_range<1>(n, 32), kernelBoth);
 		});
 	}
-	auto access = wv_buf.get_access<sycl::access::mode::read>();
+	if (doAccess)
+		auto access = wv_buf.get_access<sycl::access::mode::read>();
 //	saveArray(wv,n,"waxpby_wv");
 //	exit(1);
 	return 0;
