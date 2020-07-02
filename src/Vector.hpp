@@ -124,6 +124,44 @@ inline void CopyVector(const Vector &v, Vector &w) {
 	return;
 }
 
+inline void SyCLCopyVector(Vector_STRUCT &x, Vector_STRUCT &to) {
+	local_int_t size = x.localLength;
+	auto x_buf = *x.buf;
+	auto to_buf = *to.buf;
+	{
+		queue.submit([&](sycl::handler &cgh) {
+			auto to_acc = to_buf.get_access<sycl::access::mode::write>(cgh);
+			auto x_acc = x_buf.get_access<sycl::access::mode::read>(cgh);
+			cgh.parallel_for<class copy>(
+					sycl::nd_range<1>(size, 32),
+					[=](sycl::nd_item<1> item) {
+						size_t i = item.get_global_linear_id();
+						if (i < size)
+							to_acc[i] = x_acc[i];
+					});
+		});
+	}
+//	auto access = to_buf.get_access<sycl::access::mode::read>();
+}
+
+inline void SyCLZeroVector(Vector_STRUCT &x) {
+	local_int_t size = x.paddedLength;
+	auto x_buf = *x.buf;
+	{
+
+		queue.submit([&](sycl::handler &cgh) {
+			auto x_acc = x_buf.get_access<sycl::access::mode::write>(cgh);
+			cgh.parallel_for<class zero>(
+					sycl::nd_range<1>(size, 32),
+					[=](sycl::nd_item<1> item) {
+						size_t i = item.get_global_linear_id();
+						if (i < size)
+							x_acc[i] = 0;
+					});
+		});
+	}
+//	x_buf.get_access<sycl::access::mode::read>();
+}
 
 /*!
   Deallocates the members of the data structure of the known system matrix provided they are not 0.

@@ -37,45 +37,6 @@
 #define TOCK(t) t += mytimer() - t0 //!< store time difference in 't' using time in 't0'
 
 
-void SyCLCopyVector(Vector_STRUCT &x, Vector_STRUCT &to) {
-	local_int_t size = x.localLength;
-	auto x_buf = *x.buf;
-	auto to_buf = *to.buf;
-	{
-		queue.submit([&](sycl::handler &cgh) {
-			auto to_acc = to_buf.get_access<sycl::access::mode::write>(cgh);
-			auto x_acc = x_buf.get_access<sycl::access::mode::read>(cgh);
-			cgh.parallel_for<class copy>(
-					sycl::nd_range<1>(size, 32),
-					[=](sycl::nd_item<1> item) {
-						size_t i = item.get_global_linear_id();
-						if (i < size)
-							to_acc[i] = x_acc[i];
-					});
-		});
-	}
-	auto access = to_buf.get_access<sycl::access::mode::read>();
-}
-
-void SyCLZeroVector1(Vector_STRUCT &x) {
-	local_int_t size = x.paddedLength;
-	auto x_buf = *x.buf;
-	{
-
-		queue.submit([&](sycl::handler &cgh) {
-			auto x_acc = x_buf.get_access<sycl::access::mode::write>(cgh);
-			cgh.parallel_for<class zero>(
-					sycl::nd_range<1>(size, 32),
-					[=](sycl::nd_item<1> item) {
-						size_t i = item.get_global_linear_id();
-						if (i < size)
-							x_acc[i] = 0;
-					});
-		});
-	}
-	x_buf.get_access<sycl::access::mode::read>();
-}
-
 /*!
   Routine to compute an approximate solution to Ax = b
 
@@ -129,8 +90,8 @@ int CG(const SparseMatrix &A, CGData &data, const Vector &b, Vector &x,
 	if (print_freq<1)  print_freq=1;
 #endif
 	// p is of length ncols, copy x to p for sparse MV operation
-//	SyCLCopyVector(x, p);
-	CopyVector(x, p);
+	SyCLCopyVector(x, p);
+//	CopyVector(x, p);
 
 	TICK();
 	ComputeSPMV(A, p, Ap);
@@ -151,14 +112,14 @@ int CG(const SparseMatrix &A, CGData &data, const Vector &b, Vector &x,
 
 	// Start iterations
 	bool didMG = false;
-	for (int k = 1; k <= 100 && normr / normr0 > tolerance; k++) {
+	for (int k = 1; k <= max_iter && normr / normr0 > tolerance; k++) {
 
 		TICK();
 		if (doPreconditioning) {
 			ComputeMG(A, r, z); // Apply preconditioner
 		} else
-			CopyVector(r, z); // copy r to z (no preconditioning)
-//			SyCLCopyVector(r, z); // copy r to z (no preconditioning)
+//			CopyVector(r, z); // copy r to z (no preconditioning)
+			SyCLCopyVector(r, z); // copy r to z (no preconditioning)
 		TOCK(t5); // Preconditioner apply time
 
 		if (k == 1) {

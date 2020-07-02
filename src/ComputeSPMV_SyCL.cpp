@@ -112,8 +112,6 @@ int ComputeSPMV_SyCL(const SparseMatrix &A, Vector &x, Vector &y) {
 #ifndef HPCG_NO_MPI
 	ExchangeHalo(A, x);
 #endif
-	double *xv = x.values;
-	double *yv = y.values;
 	const local_int_t nrow = A.localNumberOfRows;
 
 #ifndef HPCG_NO_OPENMP

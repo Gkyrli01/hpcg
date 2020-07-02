@@ -281,10 +281,11 @@ int main(int argc, char *argv[]) {
 	double opt_worst_time = 0.0;
 
 	std::vector<double> opt_times(9, 0.0);
+	doAccess= false;
 
 	// Compute the residual reduction and residual count for the user ordering and optimized kernels.
 	for (int i = 0; i < numberOfCalls; ++i) {
-		ZeroVector(x); // start x at all zeros
+		SyCLZeroVector(x); // start x at all zeros
 		std::cout<<"zeroed"<<endl;
 
 		double last_cummulative_time = opt_times[0];
@@ -340,15 +341,14 @@ int main(int argc, char *argv[]) {
 	testnorms_data.values = new double[numberOfCgSets];
 	std::cout<<"preimplement"<<endl;
 
-//	doAccess= false;
+	doAccess= false;
 	for (int i = 0; i < numberOfCgSets; ++i) {
-		ZeroVector(x); // Zero out x
+		SyCLZeroVector(x); // Zero out x
 		ierr = CG(A, data, b, x, optMaxIters, optTolerance, niters, normr, normr0, &times[0], true);
 		if (ierr) HPCG_fout << "Error in call to CG: " << ierr << ".\n" << endl;
 		if (rank == 0) HPCG_fout << "Call [" << i << "] Scaled Residual [" << normr / normr0 << "]" << endl;
 		testnorms_data.values[i] = normr / normr0; // Record scaled residual from this run
 	}
-
 
 	// Compute difference between known exact solution and computed solution
 	// All processors are needed here.

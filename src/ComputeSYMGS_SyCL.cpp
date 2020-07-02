@@ -112,23 +112,17 @@ int ComputeSYMGS_SyCL(const SparseMatrix &A, const Vector &r, Vector &x) {
 #endif
 
 	const local_int_t nrow = A.localNumberOfRows;
-//	std::cout << nrow << std::endl;
-	double *rv = r.values;
-	double *xv = x.values;
 	auto *permutation = static_cast<local_int_t *>(A.optimizationData);
 	int allcolors = A.allColors;
 	int *numberOfColors = static_cast<int *>(A.numberOfColors);
 	auto xv_buf=*x.buf;
 	auto rv_buf=*r.buf;
-
 	auto matrixDiagonal_buf = *A.matrixDiagonalSYMGS;
 	auto matrix_buf = *A.matrixValuesB;
 	auto mtxIndL_buf = *A.mtxIndLB;
 	auto nonzerosinrow_buf = *A.nonzerosInRow;
 	//Keep for now
 	auto permutation_buf =* (bufferFactory.GetBuffer(permutation, sycl::range<1>(nrow)));
-
-
 	{
 
 		for (int currentColor = 0; currentColor < allcolors*2; ++currentColor) {
@@ -169,21 +163,10 @@ int ComputeSYMGS_SyCL(const SparseMatrix &A, const Vector &r, Vector &x) {
 							}
 						});
 			});
-//			queue.wait();
 		}
 	}
-//	BufferFactory sth;
-
-//	bufferFactory.GetBuffer(A.mtxIndL,sycl::range<1>(A.localNumberOfRows));
 	if (doAccess)
 		auto access = xv_buf.get_access<sycl::access::mode::read>();
-
-//
-//	std::cout << access[0]<<" | "<< matrixDiagonal[0]<<" | "<<A.matrixDiagonal[0][0]<<" | "<<A.matrixValues[0][0] << std::endl;
-//	if(nrow==1124864)
-//		std::cout << A.matrixValues[0][0] << std::endl;
-
-
 	return 0;
 }
 

@@ -36,7 +36,7 @@ public:
 
 	sycl::buffer<T1, dims> *GetBuffer(T1 *arr, sycl::range<dims> range) {
 		if (map.find(arr) == map.end()) {
-//			std::cout << "Not found existing buffer one dimension" << std::endl;
+			std::cout << "Not found existing buffer one dimension" << std::endl;
 			auto *b = new sycl::buffer<T1, dims>(arr, range);
 			map.insert(std::pair<T, sycl::buffer<T1, dims> *>(arr, b));
 		}

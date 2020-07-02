@@ -9,7 +9,6 @@
 #include <map>
 #include "Geometry.hpp"
 #include "SyCLBufferContainer.h"
-#include "Vector.hpp"
 
 
 template<typename T,typename T1, int dims>
@@ -31,6 +30,20 @@ extern SyCLBufferContainer<local_int_t *, local_int_t, 1> *integerBuffers1D;
 extern SyCLBufferContainer<char *, char, 1> *charBuffers1D;
 extern SyCLBufferContainer<double **, double, 2> *doubleBuffers2D;
 extern SyCLBufferContainer<double *, double, 1> *doubleBuffers1D;
+
+//
+//
+//void SyCLCopyVector(Vector_STRUCT &x, Vector_STRUCT &to);
+//
+//void SyCLZeroVector(Vector_STRUCT &x);
+//
+//
+
+
+
+
+
+
 
 //template<typename T,typename T1, int dims,sycl::access::mode Mode>
 //sycl::accessor<T1,dims,Mode> GetAccessor(T arr, sycl::range<dims> range) {
