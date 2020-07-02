@@ -119,11 +119,11 @@ int ComputeSPMV_SyCL(const SparseMatrix &A, Vector &x, Vector &y) {
 #ifndef HPCG_NO_OPENMP
 #pragma omp parallel for
 #endif
-	auto groups = *bufferFactory.GetBuffer(yv, sycl::range<1>(y.paddedLength));
-	auto mtxIndLbuf = *bufferFactory.GetBuffer(A.mtxIndL, sycl::range<2>(A.localNumberOfRows, 27));
-	auto matrixbuf = *bufferFactory.GetBuffer(A.matrixValues, sycl::range<2>(A.localNumberOfRows, 27));
-	auto xBuf = *bufferFactory.GetBuffer(xv, sycl::range<1>(x.paddedLength));
-	auto nonzerosinrowBuf = *bufferFactory.GetBuffer(A.nonzerosInRow, sycl::range<1>(A.localNumberOfRows));
+	auto groups =*y.buf;
+	auto mtxIndLbuf =*A.mtxIndLB;
+	auto matrixbuf =*A.matrixValuesB;
+	auto xBuf =*x.buf;
+	auto nonzerosinrowBuf =*A.nonzerosInRow;
 	ThreadPerRowSpMV<32>(queue, matrixbuf, mtxIndLbuf, nonzerosinrowBuf, xBuf, groups, nrow);
 	if (doAccess)
 		auto access = groups.get_access<sycl::access::mode::read>();

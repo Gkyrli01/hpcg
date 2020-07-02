@@ -64,7 +64,6 @@ using std::endl;
 */
 int TestSymmetry(SparseMatrix &A, Vector &b, Vector &xexact, TestSymmetryData &testsymmetry_data) {
 
-	SyncBuffers();
 	local_int_t nrow = A.localNumberOfRows;
 	local_int_t ncol = A.localNumberOfColumns;
 	int padValue = (64 - ncol % 64) * (ncol % 64 != 0);
@@ -72,6 +71,7 @@ int TestSymmetry(SparseMatrix &A, Vector &b, Vector &xexact, TestSymmetryData &t
 	InitializeVector(x_ncol, ncol, ncol + padValue);
 	InitializeVector(y_ncol, ncol, ncol + padValue);
 	InitializeVector(z_ncol, ncol, ncol + padValue);
+	std::cout << "Initi" << endl;
 
 	double t4 = 0.0; // Needed for dot-product call, otherwise unused
 	testsymmetry_data.count_fail = 0;
@@ -87,27 +87,33 @@ int TestSymmetry(SparseMatrix &A, Vector &b, Vector &xexact, TestSymmetryData &t
 
 	// Next, compute x'*A*y
 	ComputeDotProduct(nrow, y_ncol, y_ncol, yNorm2, t4, A.isDotProductOptimized);
-	SyncBuffers();
+
+	std::cout << "dot" << endl;
+
 	int ierr = ComputeSPMV(A, y_ncol, z_ncol); // z_nrow = A*y_overlap
+	std::cout << "spmv" << endl;
+
 	if (ierr) HPCG_fout << "Error in call to SpMV: " << ierr << ".\n" << endl;
 	double xtAy = 0.0;
-	SyncBuffers();
 	ierr = ComputeDotProduct(nrow, x_ncol, z_ncol, xtAy, t4, A.isDotProductOptimized); // x'*A*y
+	std::cout << "dot2" << endl;
+
 	if (ierr) HPCG_fout << "Error in call to dot: " << ierr << ".\n" << endl;
-	SyncBuffers();
 
 	// Next, compute y'*A*x
 	ComputeDotProduct(nrow, x_ncol, x_ncol, xNorm2, t4, A.isDotProductOptimized);
-	SyncBuffers();
+	std::cout << "dot3" << endl;
 
 	ierr = ComputeSPMV(A, x_ncol, z_ncol); // b_computed = A*x_overlap
+	std::cout << "spmv2" << endl;
+
 	if (ierr) HPCG_fout << "Error in call to SpMV: " << ierr << ".\n" << endl;
 	double ytAx = 0.0;
-	SyncBuffers();
 
 	ierr = ComputeDotProduct(nrow, y_ncol, z_ncol, ytAx, t4, A.isDotProductOptimized); // y'*A*x
+	std::cout << "dot4" << endl;
+
 	if (ierr) HPCG_fout << "Error in call to dot: " << ierr << ".\n" << endl;
-	SyncBuffers();
 
 	testsymmetry_data.depsym_spmv = std::fabs((long double) (xtAy - ytAx)) /
 									((xNorm2 * ANorm * yNorm2 + yNorm2 * ANorm * xNorm2) * (DBL_EPSILON));
@@ -121,22 +127,27 @@ int TestSymmetry(SparseMatrix &A, Vector &b, Vector &xexact, TestSymmetryData &t
 
 	// Compute x'*Minv*y
 	ierr = ComputeMG(A, y_ncol, z_ncol); // z_ncol = Minv*y_ncol
+	std::cout << "mg" << endl;
+
 	if (ierr) HPCG_fout << "Error in call to MG: " << ierr << ".\n" << endl;
 	double xtMinvy = 0.0;
-	SyncBuffers();
 
 	ierr = ComputeDotProduct(nrow, x_ncol, z_ncol, xtMinvy, t4, A.isDotProductOptimized); // x'*Minv*y
+	std::cout << "dot4" << endl;
+
 	if (ierr) HPCG_fout << "Error in call to dot: " << ierr << ".\n" << endl;
 
 	// Next, compute z'*Minv*x
-	SyncBuffers();
 
 	ierr = ComputeMG(A, x_ncol, z_ncol); // z_ncol = Minv*x_ncol
+	std::cout << "mg2" << endl;
+
 	if (ierr) HPCG_fout << "Error in call to MG: " << ierr << ".\n" << endl;
 	double ytMinvx = 0.0;
-	SyncBuffers();
 
 	ierr = ComputeDotProduct(nrow, y_ncol, z_ncol, ytMinvx, t4, A.isDotProductOptimized); // y'*Minv*x
+	std::cout << "dot5" << endl;
+
 	if (ierr) HPCG_fout << "Error in call to dot: " << ierr << ".\n" << endl;
 
 	testsymmetry_data.depsym_mg = std::fabs((long double) (xtMinvy - ytMinvx)) /
@@ -145,16 +156,18 @@ int TestSymmetry(SparseMatrix &A, Vector &b, Vector &xexact, TestSymmetryData &t
 	if (A.geom->rank == 0)
 		HPCG_fout << "Departure from symmetry (scaled) for MG abs(x'*Minv*y - y'*Minv*x) = "
 				  << testsymmetry_data.depsym_mg << endl;
-	SyncBuffers();
+
+	std::cout << "precopy" << endl;
 
 	CopyVector(xexact, x_ncol); // Copy exact answer into overlap vector
-	SyncBuffers();
+	std::cout << "postcopy" << endl;
+
 	int numberOfCalls = 2;
 	double residual = 0.0;
 	for (int i = 0; i < numberOfCalls; ++i) {
-		SyncBuffers();
 		ierr = ComputeSPMV(A, x_ncol, z_ncol); // b_computed = A*x_overlap
 		if (ierr) HPCG_fout << "Error in call to SpMV: " << ierr << ".\n" << endl;
+		std::cout << "preresidual" << endl;
 		if ((ierr = ComputeResidual(A.localNumberOfRows, b, z_ncol, residual)))
 			HPCG_fout << "Error in call to compute_residual: " << ierr << ".\n" << endl;
 		if (A.geom->rank == 0) HPCG_fout << "SpMV call [" << i << "] Residual [" << residual << "]" << endl;
@@ -162,6 +175,7 @@ int TestSymmetry(SparseMatrix &A, Vector &b, Vector &xexact, TestSymmetryData &t
 	DeleteVector(x_ncol);
 	DeleteVector(y_ncol);
 	DeleteVector(z_ncol);
+	std::cout << "delete syymmm" << endl;
 
 	return 0;
 }

@@ -54,11 +54,12 @@ int ComputeSYMGS_ref( const SparseMatrix & A, const Vector & r, Vector & x) {
 	double ** matrixDiagonal = A.matrixDiagonal;  // An array of pointers to the diagonal entries A.matrixValues
 	const double * const rv = r.values;
 	double * const xv = x.values;
-
+	auto access=A.nonzerosInRow->get_access<sycl::access::mode::read>();
+	char * nonzeros=access.get_pointer();
 	for (local_int_t i=0; i< nrow; i++) {
 		const double * const currentValues = A.matrixValues[i];
 		const local_int_t * const currentColIndices = A.mtxIndL[i];
-		const int currentNumberOfNonzeros = A.nonzerosInRow[i];
+		const int currentNumberOfNonzeros = nonzeros[i];
 		const double  currentDiagonal = matrixDiagonal[i][0]; // Current diagonal value
 		double sum = rv[i]; // RHS value
 
@@ -75,7 +76,7 @@ int ComputeSYMGS_ref( const SparseMatrix & A, const Vector & r, Vector & x) {
 	for (local_int_t i=nrow-1; i>=0; i--) {
 		const double * const currentValues = A.matrixValues[i];
 		const local_int_t * const currentColIndices = A.mtxIndL[i];
-		const int currentNumberOfNonzeros = A.nonzerosInRow[i];
+		const int currentNumberOfNonzeros = nonzeros[i];
 		const double  currentDiagonal = matrixDiagonal[i][0]; // Current diagonal value
 		double sum = rv[i]; // RHS value
 
@@ -87,6 +88,7 @@ int ComputeSYMGS_ref( const SparseMatrix & A, const Vector & r, Vector & x) {
 
 		xv[i] = sum/currentDiagonal;
 	}
+	(*x.buf).get_access<sycl::access::mode::write>();
 
 	return 0;
 }

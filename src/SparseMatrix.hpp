@@ -46,12 +46,19 @@ struct SparseMatrix_STRUCT {
 	local_int_t localNumberOfRows; //!< number of rows local to this process
 	local_int_t localNumberOfColumns;  //!< number of columns local to this process
 	local_int_t localNumberOfNonzeros;  //!< number of nonzeros local to this process
-	char *nonzerosInRow;  //!< The number of nonzeros in a row will always be 27 or fewer
+
+	sycl::buffer<char, 1> *nonzerosInRow;
+//	sycl::buffer<global_int_t,2>*mtxIndG;
+	sycl::buffer<local_int_t, 2> *mtxIndLB;
+	sycl::buffer<double, 1> *matrixDiagonalSYMGS;
+	sycl::buffer<double, 2> *matrixValuesB;
+
+//	char *nonzerosInRow;  //!< The number of nonzeros in a row will always be 27 or fewer
 	global_int_t **mtxIndG; //!< matrix indices as global values
 	local_int_t **mtxIndL; //!< matrix indices as local values
 	double **matrixValues; //!< values of matrix entries
+//	double *matrixDiagonalSYMGS; //!< values of matrix diagonal entries
 	double **matrixDiagonal; //!< values of matrix diagonal entries
-	double *matrixDiagonalSYMGS; //!< values of matrix diagonal entries
 
 	GlobalToLocalMap globalToLocalMap; //!< global-to-local mapping
 	std::vector<global_int_t> localToGlobalMap; //!< local-to-global mapping
@@ -130,9 +137,9 @@ inline void InitializeSparseMatrix(SparseMatrix &A, Geometry *geom) {
  */
 inline void CopyMatrixDiagonal(SparseMatrix &A, Vector &diagonal) {
 	double **curDiagA = A.matrixDiagonal;
-	double *dv = diagonal.values;
+	auto access = (*diagonal.buf).get_access<sycl::access::mode::write>();
 	assert(A.localNumberOfRows == diagonal.localLength);
-	for (local_int_t i = 0; i < A.localNumberOfRows; ++i) dv[i] = *(curDiagA[i]);
+	for (local_int_t i = 0; i < A.localNumberOfRows; ++i) access[i] = *(curDiagA[i]);
 	return;
 }
 
@@ -143,13 +150,21 @@ inline void CopyMatrixDiagonal(SparseMatrix &A, Vector &diagonal) {
   @param[in] diagonal  Vector of diagonal values that will replace existing matrix diagonal values.
  */
 inline void ReplaceMatrixDiagonal(SparseMatrix &A, Vector &diagonal) {
+
+	auto tmp=(*A.matrixValuesB).get_access<sycl::access::mode::read_write>();
+
 	double **curDiagA = A.matrixDiagonal;
-	double *dv = diagonal.values;
+	auto accessDiag = (*diagonal.buf).get_access<sycl::access::mode::read>();
+
+
 	assert(A.localNumberOfRows == diagonal.localLength);
+	auto access = (*A.matrixDiagonalSYMGS).get_access<sycl::access::mode::read_write>();
 	for (local_int_t i = 0; i < A.localNumberOfRows; ++i) {
-		*(curDiagA[i]) = dv[i];
-		A.matrixDiagonalSYMGS[i]=dv[i];
+		*(curDiagA[i]) = accessDiag[i];
+		access[i] = accessDiag[i];
 	}
+
+	std::cout<<tmp[0][0]<<" | "<<curDiagA[0][0]<<" | "<<access[0]<<std::endl;
 	return;
 }
 
@@ -160,12 +175,13 @@ inline void ReplaceMatrixDiagonal(SparseMatrix &A, Vector &diagonal) {
  */
 inline void DeleteMatrix(SparseMatrix &A) {
 
+//	delete[] A.matrixValues;
+//	delete[] A.mtxIndG;
+//	delete[] A.mtxIndL;
 #ifndef HPCG_CONTIGUOUS_ARRAYS
-	for (local_int_t i = 0; i < A.localNumberOfRows; ++i) {
-		delete[] A.matrixValues[i];
-		delete[] A.mtxIndG[i];
-		delete[] A.mtxIndL[i];
-	}
+//	for (local_int_t i = 0; i < A.localNumberOfRows; ++i) {
+//
+//	}
 #else
 	delete [] A.matrixValues[0];
 	delete [] A.mtxIndG[0];

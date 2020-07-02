@@ -53,36 +53,10 @@ int ComputeWAXPBY_SyCL(const local_int_t n, const double alpha, const Vector &x,
 	assert(x.localLength >= n); // Test vector lengths
 	assert(y.localLength >= n);
 
-	double *xv = x.values;
-	double *yv = y.values;
-	double *const wv = w.values;
-//	saveArray(xv,n,"waxpby_xv");
-//	saveArray(yv,n,"waxpby_yv");
+	auto xv_buf = *x.buf;
+	auto yv_buf = *y.buf;
+	auto wv_buf = *w.buf;
 
-//	std::cout<< n<<std::endl;
-
-//	if (alpha == 1.0) {
-//#ifndef HPCG_NO_OPENMP
-//#pragma omp parallel for
-//#endif
-//		for (local_int_t i = 0; i < n; i++) wv[i] = xv[i] + beta * yv[i];
-//	} else if (beta == 1.0) {
-//#ifndef HPCG_NO_OPENMP
-//#pragma omp parallel for
-//#endif
-//		for (local_int_t i = 0; i < n; i++) wv[i] = alpha * xv[i] + yv[i];
-//	} else {
-//#ifndef HPCG_NO_OPENMP
-//#pragma omp parallel for
-//#endif
-//		for (local_int_t i = 0; i < n; i++) wv[i] = alpha * xv[i] + beta * yv[i];
-//	}
-	auto xv_buf = *bufferFactory.GetBuffer(xv, sycl::range<1>(x.paddedLength));
-	auto yv_buf = *bufferFactory.GetBuffer(yv, sycl::range<1>(y.paddedLength));
-	auto wv_buf = *bufferFactory.GetBuffer(wv, sycl::range<1>(w.paddedLength));
-//	sycl::buffer<double, 1> xv_buf(xv, sycl::range<1>(n));
-//	sycl::buffer<double, 1> yv_buf(yv, sycl::range<1>(n));
-//	sycl::buffer<double, 1> wv_buf(wv, sycl::range<1>(n));
 	{
 		queue.submit([&](sycl::handler &cgh) {
 			auto xv_acc = xv_buf.get_access<sycl::access::mode::read>(cgh);
@@ -91,17 +65,14 @@ int ComputeWAXPBY_SyCL(const local_int_t n, const double alpha, const Vector &x,
 
 			auto kernelNoAlpha = [=](sycl::nd_item<1> item) {
 				int i = item.get_global_linear_id();
-//				if (i < n)
 					wv_acc[i] = xv_acc[i] + beta * yv_acc[i];
 			};
 			auto kernelNoBeta = [=](sycl::nd_item<1> item) {
 				int i = item.get_global_linear_id();
-//				if (i < n)
 					wv_acc[i] = alpha * xv_acc[i] + yv_acc[i];
 			};
 			auto kernelBoth = [=](sycl::nd_item<1> item) {
 				int i = item.get_global_linear_id();
-//				if (i < n)
 					wv_acc[i] = alpha * xv_acc[i] + beta * yv_acc[i];
 			};
 			if (alpha == 1.0)

@@ -15,7 +15,7 @@ add_definitions(-DSyCL_PROLONGATION)
 add_definitions(-DSyCL_WAXPBY)
 add_definitions(-DSyCL_DOT)
 add_definitions(-DSyCL_SYMGS)
-#add_definitions(-DHPCG_DEBUG)
+add_definitions(-DHPCG_DEBUG)
 #
 
 

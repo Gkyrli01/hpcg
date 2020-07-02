@@ -232,7 +232,6 @@ int main(int argc, char *argv[]) {
 	double t7 = mytimer();
 	OptimizeProblem(A, data, b, x, xexact);
 
-	std::cout << "1" << A.matrixValues[0][0] << std::endl;
 	t7 = mytimer() - t7;
 //	times[7] = t7;
 	times[7] = 0;//Temporarily remove optimization overhead
@@ -245,25 +244,19 @@ int main(int argc, char *argv[]) {
 	if (geom->size == 1) WriteProblem(*geom, A, b, x, xexact);
 #endif
 
-	std::cout << "2" << A.matrixValues[0][0] << std::endl;
 
 	//////////////////////////////
 	// Validation Testing Phase //
 	//////////////////////////////
-	SyncBuffers();
 #ifdef HPCG_DEBUG
 	t1 = mytimer();
 #endif
 	TestCGData testcg_data;
 	testcg_data.count_pass = testcg_data.count_fail = 0;
 	TestCG(A, data, b, x, testcg_data);
-	std::cout << "3" << A.matrixValues[0][0] << std::endl;
-	SyncBuffers();
 
 	TestSymmetryData testsymmetry_data;
 	TestSymmetry(A, b, xexact, testsymmetry_data);
-	std::cout << "4" << A.matrixValues[0][0] << std::endl;
-	SyncBuffers();
 
 #ifdef HPCG_DEBUG
 	if (rank==0) HPCG_fout << "Total validation (TestCG and TestSymmetry) execution time in main (sec) = " << mytimer() - t1 << endl;
@@ -286,14 +279,14 @@ int main(int argc, char *argv[]) {
 	int optMaxIters = 10 * refMaxIters;
 	int optNiters = refMaxIters;
 	double opt_worst_time = 0.0;
-	SyncBuffers();
 
 	std::vector<double> opt_times(9, 0.0);
-	std::cout << "5" << A.matrixValues[0][0] << std::endl;
 
 	// Compute the residual reduction and residual count for the user ordering and optimized kernels.
 	for (int i = 0; i < numberOfCalls; ++i) {
 		ZeroVector(x); // start x at all zeros
+		std::cout<<"zeroed"<<endl;
+
 		double last_cummulative_time = opt_times[0];
 		ierr = CG(A, data, b, x, optMaxIters, refTolerance, niters, normr, normr0, &opt_times[0], true);
 		if (ierr) ++err_count; // count the number of errors in CG
@@ -305,18 +298,12 @@ int main(int argc, char *argv[]) {
 		double current_time = opt_times[0] - last_cummulative_time;
 		if (current_time > opt_worst_time) opt_worst_time = current_time;
 	}
-	SyncBuffers();
-
-	std::cout << "6" << A.matrixValues[0][0] << std::endl;
 
 #ifndef HPCG_NO_MPI
 // Get the absolute worst time across all MPI ranks (time in CG can be different)
 	double local_opt_worst_time = opt_worst_time;
 	MPI_Allreduce(&local_opt_worst_time, &opt_worst_time, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
 #endif
-	SyncBuffers();
-
-	std::cout << "7" << A.matrixValues[0][0] << std::endl;
 
 	if (rank == 0 && err_count) HPCG_fout << err_count << " error(s) in call(s) to optimized CG." << endl;
 	if (tolerance_failures) {
@@ -331,9 +318,7 @@ int main(int argc, char *argv[]) {
 
 	// Here we finally run the benchmark phase
 	// The variable total_runtime is the target benchmark execution time in seconds
-	SyncBuffers();
 
-	std::cout << "8" << A.matrixValues[0][0] << std::endl;
 
 	double total_runtime = params.runningTime;
 	int numberOfCgSets = int(total_runtime / opt_worst_time) + 1; // Run at least once, account for rounding
@@ -346,18 +331,16 @@ int main(int argc, char *argv[]) {
 #endif
 
 	/* This is the timed run for a specified amount of time. */
-	SyncBuffers();
 
-	std::cout << "9" << A.matrixValues[0][0] << std::endl;
 
 	optMaxIters = optNiters;
 	double optTolerance = 0.0;  // Force optMaxIters iterations
 	TestNormsData testnorms_data;
 	testnorms_data.samples = numberOfCgSets;
 	testnorms_data.values = new double[numberOfCgSets];
-	SyncBuffers();
-	std::cout << "10" << A.matrixValues[0][0] << std::endl;
-	doAccess= false;
+	std::cout<<"preimplement"<<endl;
+
+//	doAccess= false;
 	for (int i = 0; i < numberOfCgSets; ++i) {
 		ZeroVector(x); // Zero out x
 		ierr = CG(A, data, b, x, optMaxIters, optTolerance, niters, normr, normr0, &times[0], true);
@@ -365,9 +348,7 @@ int main(int argc, char *argv[]) {
 		if (rank == 0) HPCG_fout << "Call [" << i << "] Scaled Residual [" << normr / normr0 << "]" << endl;
 		testnorms_data.values[i] = normr / normr0; // Record scaled residual from this run
 	}
-//	SyncBuffers();
 
-	std::cout << "11" << A.matrixValues[0][0] << std::endl;
 
 	// Compute difference between known exact solution and computed solution
 	// All processors are needed here.

@@ -34,7 +34,9 @@ int ComputeProlongation_ref(const SparseMatrix & Af, Vector & xf) {
 
 	double * xfv = xf.values;
 	double * xcv = Af.mgData->xc->values;
-	local_int_t * f2c = Af.mgData->f2cOperator;
+
+	auto access=Af.mgData->f2cOperator->get_access<sycl::access::mode::read>();
+	local_int_t * f2c=access.get_pointer();
 	local_int_t nc = Af.mgData->rc->localLength;
 
 #ifndef HPCG_NO_OPENMP
@@ -43,5 +45,7 @@ int ComputeProlongation_ref(const SparseMatrix & Af, Vector & xf) {
 // TODO: Somehow note that this loop can be safely vectorized since f2c has no repeated indices
 	for (local_int_t i=0; i<nc; ++i) xfv[f2c[i]] += xcv[i]; // This loop is safe to vectorize
 
+
+	(*xf.buf).get_access<sycl::access::mode::write>();
 	return 0;
 }

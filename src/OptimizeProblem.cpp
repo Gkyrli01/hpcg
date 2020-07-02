@@ -116,10 +116,11 @@ int OptimizeProblem(SparseMatrix & A, CGData & data, Vector & b, Vector & x, Vec
 
 	int allcolors = -1;
 	int prevColors = 0;
-
+	auto access=A.nonzerosInRow->get_access<sycl::access::mode::read>();
+	char * nonzeros=access.get_pointer();
 	while (allcolors != prevColors) {
 		prevColors = allcolors;
-		allcolors = HpcgColoring(A.mtxIndL, nrow, A.nonzerosInRow, colors);
+		allcolors = HpcgColoring(A.mtxIndL, nrow, nonzeros, colors);
 //		std::cout<<allcolors<<std::endl;
 	}
 	std::cout<<"Optimizing 2"<<std::endl;

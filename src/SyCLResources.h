@@ -55,7 +55,7 @@ extern SyCLBufferContainer<double *, double, 1> *doubleBuffers1D;
 //sycl::buffer<char, 1> *GetBuffer(char *arr, sycl::range<1> range);
 
 
-void SyncBuffers();
+//void SyncBuffers();
 
 
 //sycl::queue GetQueue(){

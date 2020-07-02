@@ -10,6 +10,7 @@ std::map<int, double *> dotProductArrays;
 
 BufferFactory bufferFactory;
 BufferFactory dotFactory;
+
 bool doAccess= true;
 bool dotAccess= true;
 
@@ -54,27 +55,27 @@ void GetBuffer(T arr, sycl::range<dims> range){
 }
 
 
-void SyncBuffers(){
-	bufferFactory.SyncBuffers();
-//
-//	for (auto it = integerBuffers1D->map.begin(); it != integerBuffers1D->map.end(); ++it)
-//	{
-//		it->second->get_access<sycl::access::mode::read>();
-//	}
-//	for (auto it = integerBuffers2D->map.begin(); it != integerBuffers2D->map.end(); ++it)
-//	{
-//		it->second->get_access<sycl::access::mode::read>();
-//	}
-//	for (auto it = doubleBuffers1D->map.begin(); it != doubleBuffers1D->map.end(); ++it)
-//	{
-//		it->second->get_access<sycl::access::mode::read>();
-//	}
-//	for (auto & it : doubleBuffers2D->map)
-//	{
-//		it.second->get_access<sycl::access::mode::read>();
-//	}
-//	for (auto it = charBuffers1D->map.begin(); it != charBuffers1D->map.end(); ++it)
-//	{
-//		it->second->get_access<sycl::access::mode::read>();
-//	}
-}
+//void SyncBuffers(){
+//	bufferFactory.SyncBuffers();
+////
+////	for (auto it = integerBuffers1D->map.begin(); it != integerBuffers1D->map.end(); ++it)
+////	{
+////		it->second->get_access<sycl::access::mode::read>();
+////	}
+////	for (auto it = integerBuffers2D->map.begin(); it != integerBuffers2D->map.end(); ++it)
+////	{
+////		it->second->get_access<sycl::access::mode::read>();
+////	}
+////	for (auto it = doubleBuffers1D->map.begin(); it != doubleBuffers1D->map.end(); ++it)
+////	{
+////		it->second->get_access<sycl::access::mode::read>();
+////	}
+////	for (auto & it : doubleBuffers2D->map)
+////	{
+////		it.second->get_access<sycl::access::mode::read>();
+////	}
+////	for (auto it = charBuffers1D->map.begin(); it != charBuffers1D->map.end(); ++it)
+////	{
+////		it->second->get_access<sycl::access::mode::read>();
+////	}
+//}

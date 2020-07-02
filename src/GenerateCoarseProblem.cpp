@@ -115,7 +115,7 @@ void GenerateCoarseProblem(const SparseMatrix &Af) {
 	InitializeVector(*Axf, Af.localNumberOfColumns, Af.localNumberOfColumns+padValue2);
 	Af.Ac = Ac;
 	MGData *mgData = new MGData;
-	InitializeMGData(f2cOperator, rc, xc, Axf, *mgData);
+	InitializeMGData(f2cOperator, rc, xc, Axf, *mgData,Af.localNumberOfRows);
 	Af.mgData = mgData;
 
 	return;

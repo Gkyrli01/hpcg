@@ -45,16 +45,11 @@
   @return Returns zero on success and a non-zero value otherwise.
 */
 int ComputeRestriction_SyCL(const SparseMatrix &A, const Vector &rf) {
-	double *Axfv = A.mgData->Axf->values;
-	double *rfv = rf.values;
-	double *rcv = A.mgData->rc->values;
-	local_int_t *f2c = A.mgData->f2cOperator;
 	local_int_t nc = A.mgData->rc->localLength;
-
-	auto axfv_buf=*bufferFactory.GetBuffer(Axfv, sycl::range<1>(A.mgData->Axf->paddedLength));
-	auto rfv_buf=*bufferFactory.GetBuffer(rfv, sycl::range<1>(rf.paddedLength));
-	auto f2c_buf=*bufferFactory.GetBuffer(f2c, sycl::range<1>(nc));
-	auto results_buf=*bufferFactory.GetBuffer(rcv, sycl::range<1>(A.mgData->rc->paddedLength));
+	auto f2c_buf=*A.mgData->f2cOperator;
+	auto rfv_buf=*rf.buf;
+	auto axfv_buf=*A.mgData->Axf->buf;
+	auto results_buf=*A.mgData->rc->buf;
 	{
 		queue.submit([&](sycl::handler &cgh) {
 			auto axfv_acc = axfv_buf.get_access<sycl::access::mode::read>(cgh);
@@ -66,7 +61,6 @@ int ComputeRestriction_SyCL(const SparseMatrix &A, const Vector &rf) {
 					[=](sycl::nd_item<1> item) {
 						int i = item.get_global_linear_id();
 						local_int_t f2c=f2c_acc[i];
-//						if(i<nc)
 							results_acc[i] = rfv_acc[f2c] - axfv_acc[f2c];
 					});
 		});

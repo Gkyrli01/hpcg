@@ -113,73 +113,29 @@ int ComputeSYMGS_SyCL(const SparseMatrix &A, const Vector &r, Vector &x) {
 
 	const local_int_t nrow = A.localNumberOfRows;
 //	std::cout << nrow << std::endl;
-	double *matrixDiagonal = A.matrixDiagonalSYMGS;  // An array of pointers to the diagonal entries A.matrixValues
 	double *rv = r.values;
 	double *xv = x.values;
 	auto *permutation = static_cast<local_int_t *>(A.optimizationData);
 	int allcolors = A.allColors;
-
-//	DoAccess(xv, rv, nrow, A.mtxIndL, A.matrixValues, matrixDiagonal, A.nonzerosInRow, permutation);
-
-//	std::cout << "All colors: " << allcolors << std::endl;
-
-
 	int *numberOfColors = static_cast<int *>(A.numberOfColors);
+	auto xv_buf=*x.buf;
+	auto rv_buf=*r.buf;
 
-//	sycl::buffer<char, 1> nonzerosinrow_buf(A.nonzerosInRow, sycl::range<1>(A.localNumberOfRows));
-//	sycl::buffer<int, 1> permutation_buf(permutation, sycl::range<1>(nrow));
-//	sycl::buffer<double, 1> xv_buf(xv, sycl::range<1>(nrow));
-//
-//	sycl::buffer<double, 1> rv_buf(rv, sycl::range<1>(nrow));
-
-//	sycl::buffer<int, 2> mtxIndL_buf(*A.mtxIndL, sycl::range<2>(A.localNumberOfRows, 27));
-//	sycl::buffer<double, 2> matrix_buf(*A.matrixValues, sycl::range<2>(A.localNumberOfRows, 27));
-//	sycl::buffer<double, 1> matrixDiagonal_buf(A.matrixDiagonalSYMGS, sycl::range<1>(A.localNumberOfRows));
-
-//	auto matrixDiagonal_buf = *(doubleBuffers1D->GetBuffer(A.matrixDiagonalSYMGS, sycl::range<1>(A.localNumberOfRows)));
-//	auto matrix_buf = *(doubleBuffers2D->GetBuffer(A.matrixValues, sycl::range<2>(A.localNumberOfRows,27)));
-//	auto mtxIndL_buf = *(integerBuffers2D->GetBuffer(A.mtxIndL, sycl::range<2>(A.localNumberOfRows,27)));
-//	auto nonzerosinrow_buf = *(charBuffers1D->GetBuffer(A.nonzerosInRow,sycl::range<1>(A.localNumberOfRows)));
-//	auto permutation_buf =* (integerBuffers1D->GetBuffer(permutation, sycl::range<1>(nrow)));
-	auto xv_buf=*bufferFactory.GetBuffer(xv, sycl::range<1>(x.paddedLength));
-	auto rv_buf=*bufferFactory.GetBuffer(rv, sycl::range<1>(r.paddedLength));
-
-	auto matrixDiagonal_buf = *(bufferFactory.GetBuffer(A.matrixDiagonalSYMGS, sycl::range<1>(A.localNumberOfRows)));
-	auto matrix_buf = *(bufferFactory.GetBuffer(A.matrixValues, sycl::range<2>(A.localNumberOfRows,27)));
-	auto mtxIndL_buf = *(bufferFactory.GetBuffer(A.mtxIndL, sycl::range<2>(A.localNumberOfRows,27)));
-	auto nonzerosinrow_buf = *(bufferFactory.GetBuffer(A.nonzerosInRow,sycl::range<1>(A.localNumberOfRows)));
+	auto matrixDiagonal_buf = *A.matrixDiagonalSYMGS;
+	auto matrix_buf = *A.matrixValuesB;
+	auto mtxIndL_buf = *A.mtxIndLB;
+	auto nonzerosinrow_buf = *A.nonzerosInRow;
+	//Keep for now
 	auto permutation_buf =* (bufferFactory.GetBuffer(permutation, sycl::range<1>(nrow)));
 
 
-//	(*r.buf).get_access<sycl::access::mode::read>();
-//	auto xv_buf = *(doubleBuffers1D->GetBuffer(xv, sycl::range<1>(nrow)));
-//	auto rv_buf = *(doubleBuffers1D->GetBuffer(rv, sycl::range<1>(nrow)));
-//	std::cout<< &nonzerosinrow_buf<<std::endl;
-
-//GetAccessor()
-//	auto matrixDiagonal_buf = *(doubleBuffers2D->GetBuffer(matrixDiagonal,sycl::range<2>(A.localNumberOfRows,1)));
-//	auto matrix_buf = *(doubleBuffers2D->GetBuffer(A.matrixValues, sycl::range<2>(A.localNumberOfRows,27)));
-//	auto mtxIndL_buf = *(integerBuffers2D->GetBuffer(A.mtxIndL, sycl::range<2>(A.localNumberOfRows,27)));
-
-
-
-//	auto nonzerosinrow_acc = (charBuffers1D->GetBuffer(A.nonzerosInRow.data(), sycl::range<1>(A.localNumberOfRows)))->get_access<sycl::access::mode::read>();
-//	auto matrixDiagonal_acc = (doubleBuffers2D->GetBuffer(matrixDiagonal, sycl::range<2>(A.localNumberOfRows,1)))->get_access<sycl::access::mode::read>();
-//	auto matrix_acc = (doubleBuffers2D->GetBuffer(A.matrixValues, sycl::range<2>(A.localNumberOfRows,27)))->get_access<sycl::access::mode::read>();
-//	auto mtxIndL_acc = (integerBuffers2D->GetBuffer(A.mtxIndL, sycl::range<2>(A.localNumberOfRows,27)))->get_access<sycl::access::mode::read>();
-//	auto permutation_acc = (integerBuffers1D->GetBuffer(permutation, sycl::range<1>(nrow)))->get_access<sycl::access::mode::read>();
-
-//	GetBuffer<char*,char,1>(A.nonzerosInRow,sycl::range<1>(A.localNumberOfRows));
 	{
-//		std::cout<<A.localNumberOfRows<<std::endl;
-//		auto nonzerosinrow_buf =*GetBuffer(A.nonzerosInRow,sycl::range<1>(A.localNumberOfRows));
 
 		for (int currentColor = 0; currentColor < allcolors*2; ++currentColor) {
 			queue.submit([&](sycl::handler &cgh) {
 				auto xv_acc = xv_buf.get_access<sycl::access::mode::read_write>(cgh);
 				auto rv_acc = (rv_buf).get_access<sycl::access::mode::read>(cgh);
 				auto nonzerosinrow_acc =nonzerosinrow_buf.get_access<sycl::access::mode::read>(cgh);
-//				nonzerosinrow_buf.get_access<sycl::access::mode::read>(cgh);
 				auto matrixDiagonal_acc = matrixDiagonal_buf.get_access<sycl::access::mode::read>(cgh);
 				auto matrix_acc = matrix_buf.get_access<sycl::access::mode::read>(cgh);
 				auto mtxIndL_acc = mtxIndL_buf.get_access<sycl::access::mode::read>(cgh);

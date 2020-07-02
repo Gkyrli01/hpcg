@@ -38,7 +38,7 @@
 
 void SyCLZeroVector(Vector_STRUCT &x){
 	local_int_t size=x.paddedLength;
-	auto x_buf=*bufferFactory.GetBuffer(x.values,sycl::range<1>(x.paddedLength));
+	auto x_buf=*x.buf;
 	{
 
 		queue.submit([&](sycl::handler &cgh) {
@@ -68,9 +68,8 @@ void SyCLZeroVector(Vector_STRUCT &x){
 int ComputeMG_SyCL(const SparseMatrix &A, const Vector &r, Vector &x) {
 	assert(x.localLength == A.localNumberOfColumns); // Make sure x contain space for halo values
 
-	SyCLZeroVector(x);
-//	ZeroVector(x); // initialize x to zero
-
+//	SyCLZeroVector(x);
+	ZeroVector(x); // initialize x to zero
 
 	int ierr = 0;
 	if (A.mgData != 0) { // Go to next coarse level if defined

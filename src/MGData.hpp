@@ -28,7 +28,9 @@
 struct MGData_STRUCT {
   int numberOfPresmootherSteps; // Call ComputeSYMGS this many times prior to coarsening
   int numberOfPostsmootherSteps; // Call ComputeSYMGS this many times after coarsening
-  local_int_t * f2cOperator; //!< 1D array containing the fine operator local IDs that will be injected into coarse space.
+
+  sycl::buffer<local_int_t ,1>*f2cOperator;
+//  local_int_t * f2cOperator; //!< 1D array containing the fine operator local IDs that will be injected into coarse space.
   Vector * rc; // coarse grid residual vector
   Vector * xc; // coarse grid solution vector
   Vector * Axf; // fine grid residual vector
@@ -47,10 +49,10 @@ typedef struct MGData_STRUCT MGData;
  @param[in] f2cOperator -
  @param[out] data the data structure for CG vectors that will be allocated to get it ready for use in CG iterations
  */
-inline void InitializeMGData(local_int_t * f2cOperator, Vector * rc, Vector * xc, Vector * Axf, MGData & data) {
+inline void InitializeMGData(local_int_t * f2cOperator, Vector * rc, Vector * xc, Vector * Axf, MGData & data,int len) {
   data.numberOfPresmootherSteps = 1;
   data.numberOfPostsmootherSteps = 1;
-  data.f2cOperator = f2cOperator; // Space for injection operator
+  data.f2cOperator = new sycl::buffer<local_int_t,1>(f2cOperator,sycl::range<1>(len)); // Space for injection operator
   data.rc = rc;
   data.xc = xc;
   data.Axf = Axf;

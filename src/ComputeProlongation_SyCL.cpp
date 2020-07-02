@@ -42,15 +42,12 @@
   @return Returns zero on success and a non-zero value otherwise.
 */
 int ComputeProlongation_SyCL(const SparseMatrix &Af, Vector &xf) {
+	auto f2c_buf = *Af.mgData->f2cOperator;
 
-	double *xfv = xf.values;
-	double *xcv = Af.mgData->xc->values;
-	local_int_t *f2c = Af.mgData->f2cOperator;
+
 	local_int_t nc = Af.mgData->rc->localLength;
-
-	auto xfv_buf = *bufferFactory.GetBuffer(xfv, sycl::range<1>(xf.paddedLength));
-	auto xcv_buf = *bufferFactory.GetBuffer(xcv, sycl::range<1>(Af.mgData->xc->paddedLength));
-	auto f2c_buf = *bufferFactory.GetBuffer(f2c, sycl::range<1>(nc));
+	auto xfv_buf = *xf.buf;
+	auto xcv_buf = *Af.mgData->xc->buf;
 	{
 		queue.submit([&](sycl::handler &cgh) {
 			auto xfv_acc = xfv_buf.get_access<sycl::access::mode::write>(cgh);

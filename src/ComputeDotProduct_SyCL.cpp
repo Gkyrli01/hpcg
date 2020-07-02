@@ -208,14 +208,12 @@ int ComputeDotProduct_SyCL(const local_int_t n, const Vector &x, const Vector &y
 	auto wgroup_size = 32;
 	auto part_size = wgroup_size * 2;
 	double local_result = 0.0;
-	double *xv = x.values;
-	double *yv = y.values;
 
 
 //	sycl::buffer<double, 1> x_buf(x.values, sycl::range<1>(x.paddedLength));
 //	sycl::buffer<double, 1> y_buf(y.values, sycl::range<1>(x.paddedLength));
-	auto x_buf = *bufferFactory.GetBuffer(x.values, sycl::range<1>(x.paddedLength));
-	auto y_buf = *bufferFactory.GetBuffer(y.values, sycl::range<1>(y.paddedLength));
+	auto x_buf = *x.buf;
+	auto y_buf =*y.buf;
 	auto len = x.paddedLength;
 	int extraMembers = 0;
 	double *output;
@@ -241,7 +239,7 @@ int ComputeDotProduct_SyCL(const local_int_t n, const Vector &x, const Vector &y
 		auto result1=*dotFactory.GetBuffer(output, sycl::range<1>(newLength));
 
 		if (initialLoop) {
-			if (yv == xv)
+			if (x.buf == y.buf)
 				CallDotSingleBufferKernel<double>(queue, wgroup_size, x_buf, result1, n_wgroups, len);
 			else
 				CallDotDoubleBufferKernel<double>(queue, wgroup_size, x_buf, y_buf, result1, n_wgroups, len);
@@ -253,10 +251,12 @@ int ComputeDotProduct_SyCL(const local_int_t n, const Vector &x, const Vector &y
 		x_buf = *dotFactory.GetBuffer(output, sycl::range<1>(newLength));
 		len = newLength;
 	}
-	if(dotAccess){
-		auto access = x_buf.get_access<sycl::access::mode::read>();
-		result = access[0];
-	}
+	auto access = x_buf.get_access<sycl::access::mode::read>();
+	result = access[0];
+//	if(dotAccess){
+//		auto access = x_buf.get_access<sycl::access::mode::read>();
+//		result = access[0];
+//	}
 //
 ////	if (yv == xv) {
 ////#ifndef HPCG_NO_OPENMP
