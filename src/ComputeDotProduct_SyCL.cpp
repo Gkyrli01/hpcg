@@ -212,8 +212,8 @@ int ComputeDotProduct_SyCL(const local_int_t n, const Vector &x, const Vector &y
 
 //	sycl::buffer<double, 1> x_buf(x.values, sycl::range<1>(x.paddedLength));
 //	sycl::buffer<double, 1> y_buf(y.values, sycl::range<1>(x.paddedLength));
-	auto x_buf = *x.buf;
-	auto y_buf =*y.buf;
+	auto x_buf = x.buf;
+	auto y_buf =y.buf;
 	auto len = x.paddedLength;
 	int extraMembers = 0;
 	double *output;

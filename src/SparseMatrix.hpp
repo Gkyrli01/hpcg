@@ -39,6 +39,10 @@ using GlobalToLocalMap = std::unordered_map< global_int_t, local_int_t >;
 #endif
 
 struct SparseMatrix_STRUCT {
+
+	SparseMatrix_STRUCT() : matrixValuesB(sycl::buffer<double ,2>(sycl::range<2>(1,1))), matrixDiagonalSYMGS(NULL),
+							mtxIndLB(sycl::buffer<local_int_t ,2>(sycl::range<2>(1,1))), nonzerosInRow(NULL) {
+	}
 	char *title; //!< name of the sparse matrix
 	Geometry *geom; //!< geometry associated with this matrix
 	global_int_t totalNumberOfRows; //!< total number of matrix rows across all processes
@@ -47,11 +51,11 @@ struct SparseMatrix_STRUCT {
 	local_int_t localNumberOfColumns;  //!< number of columns local to this process
 	local_int_t localNumberOfNonzeros;  //!< number of nonzeros local to this process
 
-	sycl::buffer<char, 1> *nonzerosInRow;
+	sycl::buffer<char, 1> nonzerosInRow;
 //	sycl::buffer<global_int_t,2>*mtxIndG;
-	sycl::buffer<local_int_t, 2> *mtxIndLB;
-	sycl::buffer<double, 1> *matrixDiagonalSYMGS;
-	sycl::buffer<double, 2> *matrixValuesB;
+	sycl::buffer<local_int_t, 2> mtxIndLB;
+	sycl::buffer<double, 1> matrixDiagonalSYMGS;
+	sycl::buffer<double, 2> matrixValuesB;
 
 //	char *nonzerosInRow;  //!< The number of nonzeros in a row will always be 27 or fewer
 	global_int_t **mtxIndG; //!< matrix indices as global values
@@ -101,7 +105,6 @@ inline void InitializeSparseMatrix(SparseMatrix &A, Geometry *geom) {
 	A.localNumberOfRows = 0;
 	A.localNumberOfColumns = 0;
 	A.localNumberOfNonzeros = 0;
-	A.nonzerosInRow = 0;
 	A.mtxIndG = 0;
 	A.mtxIndL = 0;
 	A.matrixValues = 0;
@@ -137,7 +140,7 @@ inline void InitializeSparseMatrix(SparseMatrix &A, Geometry *geom) {
  */
 inline void CopyMatrixDiagonal(SparseMatrix &A, Vector &diagonal) {
 	double **curDiagA = A.matrixDiagonal;
-	auto access = (*diagonal.buf).get_access<sycl::access::mode::write>();
+	auto access = diagonal.buf.get_access<sycl::access::mode::write>();
 	assert(A.localNumberOfRows == diagonal.localLength);
 	for (local_int_t i = 0; i < A.localNumberOfRows; ++i) access[i] = *(curDiagA[i]);
 	return;
@@ -151,14 +154,14 @@ inline void CopyMatrixDiagonal(SparseMatrix &A, Vector &diagonal) {
  */
 inline void ReplaceMatrixDiagonal(SparseMatrix &A, Vector &diagonal) {
 
-	auto tmp=(*A.matrixValuesB).get_access<sycl::access::mode::read_write>();
+	auto tmp=(A.matrixValuesB).get_access<sycl::access::mode::read_write>();
 
 	double **curDiagA = A.matrixDiagonal;
-	auto accessDiag = (*diagonal.buf).get_access<sycl::access::mode::read>();
+	auto accessDiag = diagonal.buf.get_access<sycl::access::mode::read>();
 
 
 	assert(A.localNumberOfRows == diagonal.localLength);
-	auto access = (*A.matrixDiagonalSYMGS).get_access<sycl::access::mode::read_write>();
+	auto access = (A.matrixDiagonalSYMGS).get_access<sycl::access::mode::read_write>();
 	for (local_int_t i = 0; i < A.localNumberOfRows; ++i) {
 		*(curDiagA[i]) = accessDiag[i];
 		access[i] = accessDiag[i];
@@ -188,7 +191,7 @@ inline void DeleteMatrix(SparseMatrix &A) {
 	delete [] A.mtxIndL[0];
 #endif
 	if (A.title) delete[] A.title;
-	if (A.nonzerosInRow) delete[] A.nonzerosInRow;
+//	if (A.nonzerosInRow) A.nonzerosInRow=NULL;
 	if (A.mtxIndG) delete[] A.mtxIndG;
 	if (A.mtxIndL) delete[] A.mtxIndL;
 	if (A.matrixValues) delete[] A.matrixValues;

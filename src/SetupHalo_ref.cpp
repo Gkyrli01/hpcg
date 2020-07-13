@@ -55,7 +55,7 @@ void SetupHalo_ref(SparseMatrix &A) {
 	// Extract Matrix pieces
 
 	local_int_t localNumberOfRows = A.localNumberOfRows;
-	auto access = A.nonzerosInRow->get_access<sycl::access::mode::read>();
+	auto access = A.nonzerosInRow.get_access<sycl::access::mode::read>();
 	char *nonzerosInRow = access.get_pointer();
 	global_int_t **mtxIndG = A.mtxIndG;
 	local_int_t **mtxIndL = A.mtxIndL;

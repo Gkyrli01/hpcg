@@ -241,12 +241,12 @@ void GenerateProblem_ref(SparseMatrix &A, Vector *b, Vector *x, Vector *xexact) 
 	A.localNumberOfRows = localNumberOfRows;
 	A.localNumberOfColumns = localNumberOfRows;
 	A.localNumberOfNonzeros = localNumberOfNonzeros;
-	A.nonzerosInRow = new sycl::buffer<char ,1>(nonzerosInRow,sycl::range<1>(localNumberOfRows));
+	A.nonzerosInRow =  sycl::buffer<char ,1>(nonzerosInRow,sycl::range<1>(localNumberOfRows));
 	A.mtxIndG = mtxIndG;
 	A.mtxIndL=mtxIndL;
 	A.matrixValues=matrixValues;
-	A.mtxIndLB = new sycl::buffer<local_int_t ,2>(*mtxIndL,sycl::range<2>(localNumberOfRows,elementsize));
-	A.matrixValuesB = new sycl::buffer<double ,2>(*matrixValues,sycl::range<2>(localNumberOfRows,elementsize));
+	A.mtxIndLB =  sycl::buffer<local_int_t ,2>(*mtxIndL,sycl::range<2>(localNumberOfRows,elementsize));
+	A.matrixValuesB =  sycl::buffer<double ,2>(*matrixValues,sycl::range<2>(localNumberOfRows,elementsize));
 	A.matrixDiagonal = matrixDiagonal;
 
 	auto matrixDiagonalSymgs = new double[localNumberOfRows];
@@ -259,7 +259,7 @@ void GenerateProblem_ref(SparseMatrix &A, Vector *b, Vector *x, Vector *xexact) 
 	}
 
 	std::cout<<"created matrix:"<<localNumberOfRows<<std::endl;
-	A.matrixDiagonalSYMGS = new sycl::buffer<double ,1>(matrixDiagonalSymgs,sycl::range<1>(localNumberOfRows));;
+	A.matrixDiagonalSYMGS =  sycl::buffer<double ,1>(matrixDiagonalSymgs,sycl::range<1>(localNumberOfRows));;
 
 	return;
 }

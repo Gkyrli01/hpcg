@@ -47,9 +47,9 @@
 int ComputeRestriction_SyCL(const SparseMatrix &A, const Vector &rf) {
 	local_int_t nc = A.mgData->rc->localLength;
 	auto f2c_buf=*A.mgData->f2cOperator;
-	auto rfv_buf=*rf.buf;
-	auto axfv_buf=*A.mgData->Axf->buf;
-	auto results_buf=*A.mgData->rc->buf;
+	auto rfv_buf=rf.buf;
+	auto axfv_buf=A.mgData->Axf->buf;
+	auto results_buf=A.mgData->rc->buf;
 	{
 		queue.submit([&](sycl::handler &cgh) {
 			auto axfv_acc = axfv_buf.get_access<sycl::access::mode::read>(cgh);

@@ -99,7 +99,7 @@ void DoAccess(double *xv, double *rv, int nrow, local_int_t **pInt, double **pDo
 
   @see ComputeSYMGS
 */
-int ComputeSYMGS_SyCL(const SparseMatrix &A, const Vector &r, Vector &x) {
+int ComputeSYMGS_SyCL(SparseMatrix &A, const Vector &r, Vector &x) {
 
 	assert(x.localLength == A.localNumberOfColumns); // Make sure x contain space for halo values
 	if (!A.optimizationData) {
@@ -115,12 +115,12 @@ int ComputeSYMGS_SyCL(const SparseMatrix &A, const Vector &r, Vector &x) {
 	auto *permutation = static_cast<local_int_t *>(A.optimizationData);
 	int allcolors = A.allColors;
 	int *numberOfColors = static_cast<int *>(A.numberOfColors);
-	auto xv_buf=*x.buf;
-	auto rv_buf=*r.buf;
-	auto matrixDiagonal_buf = *A.matrixDiagonalSYMGS;
-	auto matrix_buf = *A.matrixValuesB;
-	auto mtxIndL_buf = *A.mtxIndLB;
-	auto nonzerosinrow_buf = *A.nonzerosInRow;
+	auto xv_buf=x.buf;
+	auto rv_buf=r.buf;
+	auto matrixDiagonal_buf = A.matrixDiagonalSYMGS;
+	auto matrix_buf = A.matrixValuesB;
+	auto mtxIndL_buf = A.mtxIndLB;
+	auto nonzerosinrow_buf = A.nonzerosInRow;
 	//Keep for now
 	auto permutation_buf =* (bufferFactory.GetBuffer(permutation, sycl::range<1>(nrow)));
 	{

@@ -31,7 +31,7 @@
 
   @see ComputeMG_ref
 */
-int ComputeMG(const SparseMatrix  & A, const Vector & r, Vector & x) {
+int ComputeMG( SparseMatrix  & A, const Vector & r, Vector & x) {
 
   // This line and the next two lines should be removed and your version of ComputeSYMGS should be used.
 //  A.isMgOptimized = false;

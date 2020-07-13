@@ -53,9 +53,9 @@ int ComputeWAXPBY_SyCL(const local_int_t n, const double alpha, const Vector &x,
 	assert(x.localLength >= n); // Test vector lengths
 	assert(y.localLength >= n);
 
-	auto xv_buf = *x.buf;
-	auto yv_buf = *y.buf;
-	auto wv_buf = *w.buf;
+	auto xv_buf = x.buf;
+	auto yv_buf = y.buf;
+	auto wv_buf = w.buf;
 
 	{
 		queue.submit([&](sycl::handler &cgh) {

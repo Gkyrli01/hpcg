@@ -51,13 +51,13 @@
 
   @return Returns zero on success and a non-zero value otherwise.
 */
-int ComputeResidual(const local_int_t n, const Vector &v1, const Vector &v2, double &residual) {
+int ComputeResidual(const local_int_t n,  Vector &v1,  Vector &v2, double &residual) {
 	double local_residual = 0.0;
 
-	auto access1 = (*v1.buf).get_access<sycl::access::mode::read>();
+	auto access1 = v1.buf.get_access<sycl::access::mode::read>();
 	double *v1v = access1.get_pointer();
 
-	auto access2 = (*v2.buf).get_access<sycl::access::mode::read>();
+	auto access2 = v2.buf.get_access<sycl::access::mode::read>();
 	double *v2v = access2.get_pointer();
 
 #ifndef HPCG_NO_OPENMP

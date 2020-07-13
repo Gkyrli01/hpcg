@@ -38,8 +38,7 @@
   @return returns 0 upon success and non-zero otherwise
   @see ComputeSPMV
 */
-int ComputeSPMV_ref( const SparseMatrix & A, Vector & x, Vector & y) {
-
+int ComputeSPMV_ref(SparseMatrix & A, Vector & x, Vector & y) {
 	assert(x.localLength>=A.localNumberOfColumns); // Test vector lengths
 	assert(y.localLength>=A.localNumberOfRows);
 
@@ -49,8 +48,8 @@ int ComputeSPMV_ref( const SparseMatrix & A, Vector & x, Vector & y) {
 	const double * const xv = x.values;
 	double * const yv = y.values;
 	const local_int_t nrow = A.localNumberOfRows;
+	auto access=A.nonzerosInRow.get_access<sycl::access::mode::read>();
 
-	auto access=A.nonzerosInRow->get_access<sycl::access::mode::read>();
 	char * nonzeros=access.get_pointer();
 #ifndef HPCG_NO_OPENMP
 #pragma omp parallel for
@@ -65,7 +64,7 @@ int ComputeSPMV_ref( const SparseMatrix & A, Vector & x, Vector & y) {
 			sum += cur_vals[j]*xv[cur_inds[j]];
 		yv[i] = sum;
 	}
-	(*y.buf).get_access<sycl::access::mode::write>();
+	y.buf.get_access<sycl::access::mode::write>();
 
 
 	return 0;

@@ -43,17 +43,17 @@
   @return returns 0 upon success and non-zero otherwise
   @see ComputeDotProduct
 */
-int ComputeDotProduct_ref(const local_int_t n, const Vector &x, const Vector &y,
+int ComputeDotProduct_ref(const local_int_t n,  Vector &x,  Vector &y,
 						  double &result, double &time_allreduce) {
 	assert(x.localLength >= n); // Test vector lengths
 	assert(y.localLength >= n);
 
 	double local_result = 0.0;
 	{
-		(*x.buf).get_access<sycl::access::mode::read>();
+		x.buf.get_access<sycl::access::mode::read>();
 	}
 	{
-		(*y.buf).get_access<sycl::access::mode::read>();
+		y.buf.get_access<sycl::access::mode::read>();
 	}
 
 	double *xv = x.values;

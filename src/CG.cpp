@@ -57,7 +57,7 @@
 
   @see CG_ref()
 */
-int CG(const SparseMatrix &A, CGData &data, const Vector &b, Vector &x,
+int CG( SparseMatrix &A, CGData &data, const Vector &b, Vector &x,
 	   const int max_iter, const double tolerance, int &niters, double &normr, double &normr0,
 	   double *times, bool doPreconditioning) {
 
@@ -91,8 +91,6 @@ int CG(const SparseMatrix &A, CGData &data, const Vector &b, Vector &x,
 #endif
 	// p is of length ncols, copy x to p for sparse MV operation
 	SyCLCopyVector(x, p);
-//	CopyVector(x, p);
-
 	TICK();
 	ComputeSPMV(A, p, Ap);
 	TOCK(t3); // Ap = A*p
@@ -118,7 +116,6 @@ int CG(const SparseMatrix &A, CGData &data, const Vector &b, Vector &x,
 		if (doPreconditioning) {
 			ComputeMG(A, r, z); // Apply preconditioner
 		} else
-//			CopyVector(r, z); // copy r to z (no preconditioning)
 			SyCLCopyVector(r, z); // copy r to z (no preconditioning)
 		TOCK(t5); // Preconditioner apply time
 

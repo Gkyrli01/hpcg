@@ -46,6 +46,6 @@ int ComputeProlongation_ref(const SparseMatrix & Af, Vector & xf) {
 	for (local_int_t i=0; i<nc; ++i) xfv[f2c[i]] += xcv[i]; // This loop is safe to vectorize
 
 
-	(*xf.buf).get_access<sycl::access::mode::write>();
+	xf.buf.get_access<sycl::access::mode::write>();
 	return 0;
 }

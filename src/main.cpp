@@ -107,11 +107,9 @@ int main(int argc, char *argv[]) {
 	ny = (local_int_t) params.ny;
 	nz = (local_int_t) params.nz;
 	int ierr = 0;  // Used to check return codes on function calls
-
 	ierr = CheckAspectRatio(0.125, nx, ny, nz, "local problem", rank == 0);
 	if (ierr)
 		return ierr;
-
 	/////////////////////////
 	// Problem setup Phase //
 	/////////////////////////
@@ -258,6 +256,8 @@ int main(int argc, char *argv[]) {
 	TestSymmetryData testsymmetry_data;
 	TestSymmetry(A, b, xexact, testsymmetry_data);
 
+	std::cout << "Yes?\n";
+
 #ifdef HPCG_DEBUG
 	if (rank==0) HPCG_fout << "Total validation (TestCG and TestSymmetry) execution time in main (sec) = " << mytimer() - t1 << endl;
 #endif
@@ -281,21 +281,18 @@ int main(int argc, char *argv[]) {
 	double opt_worst_time = 0.0;
 
 	std::vector<double> opt_times(9, 0.0);
-	doAccess= false;
-
+	doAccess = false;
 	// Compute the residual reduction and residual count for the user ordering and optimized kernels.
 	for (int i = 0; i < numberOfCalls; ++i) {
 		SyCLZeroVector(x); // start x at all zeros
-		std::cout<<"zeroed"<<endl;
+		std::cout << "zeroed" << endl;
 
 		double last_cummulative_time = opt_times[0];
 		ierr = CG(A, data, b, x, optMaxIters, refTolerance, niters, normr, normr0, &opt_times[0], true);
 		if (ierr) ++err_count; // count the number of errors in CG
 		if (normr / normr0 > refTolerance) ++tolerance_failures; // the number of failures to reduce residual
-
 		// pick the largest number of iterations to guarantee convergence
 		if (niters > optNiters) optNiters = niters;
-
 		double current_time = opt_times[0] - last_cummulative_time;
 		if (current_time > opt_worst_time) opt_worst_time = current_time;
 	}
@@ -333,15 +330,14 @@ int main(int argc, char *argv[]) {
 
 	/* This is the timed run for a specified amount of time. */
 
-
 	optMaxIters = optNiters;
 	double optTolerance = 0.0;  // Force optMaxIters iterations
 	TestNormsData testnorms_data;
 	testnorms_data.samples = numberOfCgSets;
 	testnorms_data.values = new double[numberOfCgSets];
-	std::cout<<"preimplement"<<endl;
+	std::cout << "preimplement" << endl;
 
-	doAccess= false;
+	doAccess = false;
 	for (int i = 0; i < numberOfCgSets; ++i) {
 		SyCLZeroVector(x); // Zero out x
 		ierr = CG(A, data, b, x, optMaxIters, optTolerance, niters, normr, normr0, &times[0], true);

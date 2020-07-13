@@ -17,6 +17,6 @@
 #include "SparseMatrix.hpp"
 #include "Vector.hpp"
 
-int ComputeMG_SyCL(const SparseMatrix  & A, const Vector & r, Vector & x);
+int ComputeMG_SyCL( SparseMatrix  & A, const Vector & r, Vector & x);
 
 #endif // COMPUTEMG_REF_HPP

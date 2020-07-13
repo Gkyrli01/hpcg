@@ -65,7 +65,7 @@
 
   @see ComputeMG
 */
-int ComputeMG_SyCL(const SparseMatrix &A, const Vector &r, Vector &x) {
+int ComputeMG_SyCL(SparseMatrix &A, const Vector &r, Vector &x) {
 	assert(x.localLength == A.localNumberOfColumns); // Make sure x contain space for halo values
 
 	SyCLZeroVector(x);

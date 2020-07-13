@@ -46,8 +46,8 @@ int ComputeProlongation_SyCL(const SparseMatrix &Af, Vector &xf) {
 
 
 	local_int_t nc = Af.mgData->rc->localLength;
-	auto xfv_buf = *xf.buf;
-	auto xcv_buf = *Af.mgData->xc->buf;
+	auto xfv_buf = xf.buf;
+	auto xcv_buf = Af.mgData->xc->buf;
 	{
 		queue.submit([&](sycl::handler &cgh) {
 			auto xfv_acc = xfv_buf.get_access<sycl::access::mode::write>(cgh);

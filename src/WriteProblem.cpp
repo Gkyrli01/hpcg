@@ -49,7 +49,7 @@
 
   @see GenerateProblem
 */
-int WriteProblem(const Geometry &geom, const SparseMatrix &A,
+int WriteProblem(const Geometry &geom,  SparseMatrix &A,
 				 const Vector b, const Vector x, const Vector xexact) {
 
 	if (geom.size != 1) return -1; //TODO Only works on one processor.  Need better error handler
@@ -68,7 +68,7 @@ int WriteProblem(const Geometry &geom, const SparseMatrix &A,
 		if (fA) fclose(fA);
 		return -1;
 	}
-	auto access = A.nonzerosInRow->get_access<sycl::access::mode::read>();
+	auto access = A.nonzerosInRow.get_access<sycl::access::mode::read>();
 	char *nonzerosInRow = access.get_pointer();
 	for (global_int_t i = 0; i < nrow; i++) {
 		const double *const currentRowValues = A.matrixValues[i];

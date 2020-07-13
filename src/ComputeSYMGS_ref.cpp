@@ -42,7 +42,7 @@
   @return returns 0 upon success and non-zero otherwise
   @see ComputeSYMGS
 */
-int ComputeSYMGS_ref( const SparseMatrix & A, const Vector & r, Vector & x) {
+int ComputeSYMGS_ref(  SparseMatrix & A, const Vector & r, Vector & x) {
 
 	assert(x.localLength==A.localNumberOfColumns); // Make sure x contain space for halo values
 
@@ -54,7 +54,7 @@ int ComputeSYMGS_ref( const SparseMatrix & A, const Vector & r, Vector & x) {
 	double ** matrixDiagonal = A.matrixDiagonal;  // An array of pointers to the diagonal entries A.matrixValues
 	const double * const rv = r.values;
 	double * const xv = x.values;
-	auto access=A.nonzerosInRow->get_access<sycl::access::mode::read>();
+	auto access=A.nonzerosInRow.get_access<sycl::access::mode::read>();
 	char * nonzeros=access.get_pointer();
 	for (local_int_t i=0; i< nrow; i++) {
 		const double * const currentValues = A.matrixValues[i];
@@ -88,7 +88,7 @@ int ComputeSYMGS_ref( const SparseMatrix & A, const Vector & r, Vector & x) {
 
 		xv[i] = sum/currentDiagonal;
 	}
-	(*x.buf).get_access<sycl::access::mode::write>();
+	x.buf.get_access<sycl::access::mode::write>();
 
 	return 0;
 }

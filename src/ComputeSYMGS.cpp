@@ -48,7 +48,7 @@
 
   @see ComputeSYMGS_ref
 */
-int ComputeSYMGS( const SparseMatrix & A, const Vector & r, Vector & x) {
+int ComputeSYMGS( SparseMatrix & A, const Vector & r, Vector & x) {
 
 #if defined(SyCL_SYMGS)
 	return ComputeSYMGS_SyCL(A, r, x);

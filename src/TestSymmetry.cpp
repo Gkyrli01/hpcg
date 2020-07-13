@@ -172,6 +172,7 @@ int TestSymmetry(SparseMatrix &A, Vector &b, Vector &xexact, TestSymmetryData &t
 			HPCG_fout << "Error in call to compute_residual: " << ierr << ".\n" << endl;
 		if (A.geom->rank == 0) HPCG_fout << "SpMV call [" << i << "] Residual [" << residual << "]" << endl;
 	}
+
 	DeleteVector(x_ncol);
 	DeleteVector(y_ncol);
 	DeleteVector(z_ncol);

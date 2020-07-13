@@ -39,8 +39,6 @@ int ComputeRestriction_ref(const SparseMatrix & A, const Vector & rf) {
 	double * rcv = A.mgData->rc->values;
 	auto access=A.mgData->f2cOperator->get_access<sycl::access::mode::read>();
 	local_int_t * f2c=access.get_pointer();
-
-
 	local_int_t nc = A.mgData->rc->localLength;
 
 #ifndef HPCG_NO_OPENMP
@@ -49,7 +47,7 @@ int ComputeRestriction_ref(const SparseMatrix & A, const Vector & rf) {
 	for (local_int_t i=0; i<nc; ++i) rcv[i] = rfv[f2c[i]] - Axfv[f2c[i]];
 
 
-	(*A.mgData->rc->buf).get_access<sycl::access::mode::write>();
+	A.mgData->rc->buf.get_access<sycl::access::mode::write>();
 
 	return 0;
 }
