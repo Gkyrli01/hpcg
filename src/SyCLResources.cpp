@@ -13,6 +13,7 @@ BufferFactory dotFactory;
 
 bool doAccess= true;
 bool dotAccess= true;
+bool transpose= false;
 
 SyCLBufferContainer<local_int_t **, local_int_t, 2> *integerBuffers2D= new SyCLBufferContainer<local_int_t **, local_int_t, 2>();
 SyCLBufferContainer<local_int_t *, local_int_t, 1> *integerBuffers1D=new SyCLBufferContainer<local_int_t *, local_int_t, 1>();

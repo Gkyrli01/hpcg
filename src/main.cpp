@@ -281,6 +281,7 @@ int main(int argc, char *argv[]) {
 	double opt_worst_time = 0.0;
 
 	std::vector<double> opt_times(9, 0.0);
+	transpose= true;
 	doAccess = false;
 	// Compute the residual reduction and residual count for the user ordering and optimized kernels.
 	for (int i = 0; i < numberOfCalls; ++i) {

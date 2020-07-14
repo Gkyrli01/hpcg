@@ -41,7 +41,9 @@ using GlobalToLocalMap = std::unordered_map< global_int_t, local_int_t >;
 struct SparseMatrix_STRUCT {
 
 	SparseMatrix_STRUCT() : matrixValuesB(sycl::buffer<double ,2>(sycl::range<2>(1,1))), matrixDiagonalSYMGS(NULL),
-							mtxIndLB(sycl::buffer<local_int_t ,2>(sycl::range<2>(1,1))), nonzerosInRow(NULL) {
+							mtxIndLB(sycl::buffer<local_int_t ,2>(sycl::range<2>(1,1))), nonzerosInRow(NULL),
+							matrixValuesBT(sycl::buffer<double ,2>(sycl::range<2>(1,1))),
+							mtxIndLBT(sycl::buffer<local_int_t ,2>(sycl::range<2>(1,1))){
 	}
 	char *title; //!< name of the sparse matrix
 	Geometry *geom; //!< geometry associated with this matrix
@@ -53,9 +55,13 @@ struct SparseMatrix_STRUCT {
 
 	sycl::buffer<char, 1> nonzerosInRow;
 //	sycl::buffer<global_int_t,2>*mtxIndG;
-	sycl::buffer<local_int_t, 2> mtxIndLB;
 	sycl::buffer<double, 1> matrixDiagonalSYMGS;
 	sycl::buffer<double, 2> matrixValuesB;
+	sycl::buffer<local_int_t, 2> mtxIndLB;
+
+	sycl::buffer<double, 2> matrixValuesBT;
+	sycl::buffer<local_int_t, 2> mtxIndLBT;
+
 
 //	char *nonzerosInRow;  //!< The number of nonzeros in a row will always be 27 or fewer
 	global_int_t **mtxIndG; //!< matrix indices as global values

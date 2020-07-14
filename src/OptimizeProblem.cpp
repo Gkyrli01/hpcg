@@ -101,6 +101,44 @@ int HpcgColoring(local_int_t **graph, int rows, char *nonzeros, int *colors) {
 int OptimizeProblem(SparseMatrix & A, CGData & data, Vector & b, Vector & x, Vector & xexact) {
 
 
+//
+//	auto* arr=new double[27*localNumberOfRows];
+//	auto* arr2=new local_int_t[27*localNumberOfRows];
+
+	A.matrixValuesBT = sycl::buffer<double, 2>(sycl::range<2>(27, A.localNumberOfRows));
+	A.mtxIndLBT = sycl::buffer<local_int_t, 2>(sycl::range<2>(27, A.localNumberOfRows));
+	{
+		auto matr2 = A.matrixValuesBT.get_access<sycl::access::mode::write>();
+		auto mtx2 = A.mtxIndLBT.get_access<sycl::access::mode::write>();
+
+		for (int l1 = 0; l1 < A.localNumberOfRows; ++l1) {
+			for (int i = 0; i < 27; ++i) {
+				matr2[i][l1] = A.matrixValues[l1][i];
+				mtx2[i][l1] = A.mtxIndL[l1][i];
+			}
+		}
+//		queue.submit([&](sycl::handler &cgh) {
+//			auto matrix_acc = A.matrixValuesB.get_access<sycl::access::mode::read>(cgh);
+//			auto matrixNew_acc = A.matrixValuesBT.get_access<sycl::access::mode::write>(cgh);
+//
+//			auto mtxIndL_acc = A.mtxIndLB.get_access<sycl::access::mode::read>(cgh);
+//			auto mtxIndLNew_acc = A.mtxIndLBT.get_access<sycl::access::mode::write>(cgh);
+//
+//			cgh.parallel_for<class transpose>(
+//					sycl::nd_range<1>(localNumberOfRows * 32, 32),
+//					[=](sycl::nd_item<1> item) {
+//						int j = item.get_local_id();
+//						if(j<27) {
+//							int i = item.get_group(0);
+//							mtxIndLNew_acc[j][i] = mtxIndL_acc[i][j];
+//							matrixNew_acc[j][i] = matrix_acc[i][j];
+//						}
+//					});
+//		});
+//		auto acceeesss = matrix2_buf.get_access<sycl::access::mode::read>();
+//		auto acceeesss2 = mtxIndL2_buf.get_access<sycl::access::mode::read>();
+	}
+
 	std::cout<<"Optimizing started"<<std::endl;
   	int nrow=A.localNumberOfRows;
 

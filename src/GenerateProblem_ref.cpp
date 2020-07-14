@@ -241,12 +241,12 @@ void GenerateProblem_ref(SparseMatrix &A, Vector *b, Vector *x, Vector *xexact) 
 	A.localNumberOfRows = localNumberOfRows;
 	A.localNumberOfColumns = localNumberOfRows;
 	A.localNumberOfNonzeros = localNumberOfNonzeros;
-	A.nonzerosInRow =  sycl::buffer<char ,1>(nonzerosInRow,sycl::range<1>(localNumberOfRows));
+	A.nonzerosInRow = sycl::buffer<char, 1>(nonzerosInRow, sycl::range<1>(localNumberOfRows));
 	A.mtxIndG = mtxIndG;
-	A.mtxIndL=mtxIndL;
-	A.matrixValues=matrixValues;
-	A.mtxIndLB =  sycl::buffer<local_int_t ,2>(*mtxIndL,sycl::range<2>(localNumberOfRows,elementsize));
-	A.matrixValuesB =  sycl::buffer<double ,2>(*matrixValues,sycl::range<2>(localNumberOfRows,elementsize));
+	A.mtxIndL = mtxIndL;
+	A.matrixValues = matrixValues;
+	A.mtxIndLB = sycl::buffer<local_int_t, 2>(*mtxIndL, sycl::range<2>(localNumberOfRows, elementsize));
+	A.matrixValuesB = sycl::buffer<double, 2>(*matrixValues, sycl::range<2>(localNumberOfRows, elementsize));
 	A.matrixDiagonal = matrixDiagonal;
 
 	auto matrixDiagonalSymgs = new double[localNumberOfRows];
@@ -258,8 +258,48 @@ void GenerateProblem_ref(SparseMatrix &A, Vector *b, Vector *x, Vector *xexact) 
 		matrixDiagonalSymgs[k] = matrixDiagonal[k][0];
 	}
 
-	std::cout<<"created matrix:"<<localNumberOfRows<<std::endl;
-	A.matrixDiagonalSYMGS =  sycl::buffer<double ,1>(matrixDiagonalSymgs,sycl::range<1>(localNumberOfRows));;
+	std::cout << "created matrix:" << localNumberOfRows << std::endl;
+	A.matrixDiagonalSYMGS = sycl::buffer<double, 1>(matrixDiagonalSymgs, sycl::range<1>(localNumberOfRows));;
+
+
+//	{
+//		auto matr2 = A.matrixValuesBT.get_access<sycl::access::mode::read>();
+//		auto mtx2 = A.mtxIndLBT.get_access<sycl::access::mode::read>();
+//		for (int l1 = 0; l1 < localNumberOfRows; ++l1) {
+//			for (int i = 0; i < 27; ++i) {
+//				if (matr2[i][l1]!=matrixValues[l1][i]){
+//					std::cout<<"Inequal!";
+//				}
+//				if (mtx2[i][l1]!=mtxIndL[l1][i]){
+//					std::cout<<"Inequal!";
+//				}
+//			}
+//		}
+//
+//	}
+
+//	}
+//	{
+//		queue.submit([&](sycl::handler &cgh) {
+//			auto matrix_acc = matrix_buf.get_access<sycl::access::mode::read>(cgh);
+//			auto matrixNew_acc = matrix2_buf.get_access<sycl::access::mode::write>(cgh);
+//
+//			auto mtxIndL_acc = mtxIndL_buf.get_access<sycl::access::mode::read>(cgh);
+//			auto mtxIndLNew_acc = mtxIndL2_buf.get_access<sycl::access::mode::write>(cgh);
+//
+//			cgh.parallel_for<class transpose>(
+//					sycl::nd_range<1>(rows * 32, 32),
+//					[=](sycl::nd_item<1> item) {
+//						int j = item.get_local_id();
+//						int i = item.get_group(0);
+//						mtxIndLNew_acc[j][i] = mtxIndL_acc[i][j];
+//						matrixNew_acc[j][i] = matrix_acc[i][j];
+//					});
+//		});
+//		auto acceeesss = matrix2_buf.get_access<sycl::access::mode::read>();
+//		auto acceeesss2 = mtxIndL2_buf.get_access<sycl::access::mode::read>();
+//	}
+
 
 	return;
 }
