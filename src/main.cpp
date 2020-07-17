@@ -282,6 +282,9 @@ int main(int argc, char *argv[]) {
 
 	std::vector<double> opt_times(9, 0.0);
 	transpose= true;
+	ReorderAll(A,data,b,x,xexact,1);
+//	ReorderAll(A,data,b,x,xexact,1);
+
 	doAccess = false;
 	// Compute the residual reduction and residual count for the user ordering and optimized kernels.
 	for (int i = 0; i < numberOfCalls; ++i) {
@@ -337,6 +340,7 @@ int main(int argc, char *argv[]) {
 	testnorms_data.samples = numberOfCgSets;
 	testnorms_data.values = new double[numberOfCgSets];
 	std::cout << "preimplement" << endl;
+//	transpose= false;
 
 	doAccess = false;
 	for (int i = 0; i < numberOfCgSets; ++i) {

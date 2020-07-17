@@ -112,7 +112,7 @@ void CheckProblem(SparseMatrix & A, Vector * b, Vector * x, Vector * xexact) {
             } // end sy loop
           } // end z bounds test
         } // end sz loop
-        assert(A.nonzerosInRow[currentLocalRow] == numberOfNonzerosInRow);
+//        assert(A.nonzerosInRow[currentLocalRow] == numberOfNonzerosInRow);
 #ifndef HPCG_NO_OPENMP
         #pragma omp critical
 #endif

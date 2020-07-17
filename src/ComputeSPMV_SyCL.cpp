@@ -38,29 +38,6 @@
 #include <fstream>
 #include <iostream>
 
-template<class T>
-bool saveArray(const T *pdata, size_t length, const std::string &file_path) {
-	std::ofstream os(file_path.c_str(), std::ios::binary | std::ios::out);
-	if (!os.is_open())
-		return false;
-	os.write(reinterpret_cast<const char *>(pdata), std::streamsize(length * sizeof(T)));
-	os.close();
-	return true;
-}
-
-template<class T>
-bool save2dArray(T **pdata, size_t rows, size_t elements, const std::string &file_path) {
-	std::ofstream os(file_path.c_str(), std::ios::binary | std::ios::out);
-	if (!os.is_open())
-		return false;
-	for (size_t i = 0; i < rows; ++i) {
-		os.write(reinterpret_cast<const char *>(pdata[i]), std::streamsize(elements * sizeof(T)));
-	}
-	os.close();
-	return true;
-}
-
-
 template<int wgroup_size>
 void ThreadPerRowSpMV(sycl::queue &queue, sycl::buffer<double, 2> &matrixbuf, sycl::buffer<int, 2> &mtxIndLbuf,
 					  sycl::buffer<char, 1> &nonzerosinrowBuf, sycl::buffer<double, 1> &xBuf,
@@ -133,7 +110,6 @@ int ComputeSPMV_SyCL(const SparseMatrix &A, Vector &x, Vector &y) {
 		matrixbuf = A.matrixValuesBT;
 		mtxIndLbuf = A.mtxIndLBT;
 	}
-
 	auto xBuf =x.buf;
 	auto nonzerosinrowBuf =A.nonzerosInRow;
 	ThreadPerRowSpMV<32>(queue, matrixbuf, mtxIndLbuf, nonzerosinrowBuf, xBuf, groups, nrow);

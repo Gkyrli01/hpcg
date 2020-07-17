@@ -119,35 +119,12 @@ int ComputeSYMGS_SyCL(SparseMatrix &A, const Vector &r, Vector &x) {
 	auto matrixDiagonal_buf = A.matrixDiagonalSYMGS;
 	auto matrix_buf = A.matrixValuesB;
 	auto mtxIndL_buf = A.mtxIndLB;
+
 	if (transpose) {
 		matrix_buf = A.matrixValuesBT;
 		mtxIndL_buf = A.mtxIndLBT;
 	}
 
-//	{
-//		bool sth=false;
-//		bool sth2=false;
-//
-//		auto matr2 = A.matrixValuesBT.get_access<sycl::access::mode::read>();
-//		auto mtx2 = A.mtxIndLBT.get_access<sycl::access::mode::read>();
-//		for (int l1 = 0; l1 < A.localNumberOfRows; ++l1) {
-//			for (int i = 0; i < 27; ++i) {
-//				if (matr2[i][l1]!=A.matrixValues[l1][i]){
-//					sth=true;
-//				}
-//				if (mtx2[i][l1]!=A.mtxIndL[l1][i]){
-//					sth2=true;
-//				}
-//			}
-//
-//		}
-//		if(sth)
-//			std::cout<<" MAtrix vals diff\n";
-//		if(sth2)
-//			std::cout<<" MtxINd vals diff\n";
-//
-//
-//	}
 	auto nonzerosinrow_buf = A.nonzerosInRow;
 	//Keep for now
 	auto permutation_buf = *(bufferFactory.GetBuffer(permutation, sycl::range<1>(nrow)));
@@ -161,7 +138,6 @@ int ComputeSYMGS_SyCL(SparseMatrix &A, const Vector &r, Vector &x) {
 
 				auto matrix_acc = matrix_buf.get_access<sycl::access::mode::read>(cgh);
 				auto mtxIndL_acc = mtxIndL_buf.get_access<sycl::access::mode::read>(cgh);
-				auto permutation_acc = permutation_buf.get_access<sycl::access::mode::read>(cgh);
 				int tmpCol = currentColor;
 				//Provides forward and backward sweeps
 				if (currentColor >= allcolors) {
@@ -174,7 +150,8 @@ int ComputeSYMGS_SyCL(SparseMatrix &A, const Vector &r, Vector &x) {
 				}
 				const int offset = tmp;
 				const int items = numberOfColors[col];
-				if (!transpose)
+				if (!transpose) {
+					auto permutation_acc = permutation_buf.get_access<sycl::access::mode::read>(cgh);
 					cgh.parallel_for<class symgs>(
 							sycl::nd_range<1>(items, 8),
 							[=](sycl::nd_item<1> item) {
@@ -190,13 +167,12 @@ int ComputeSYMGS_SyCL(SparseMatrix &A, const Vector &r, Vector &x) {
 									xv_acc[i] = (sum) / currentDiagonal;
 								}
 							});
-				else {
+				}else {
 					cgh.parallel_for<class symgsTranposed>(
 							sycl::nd_range<1>(items, 32),
 							[=](sycl::nd_item<1> item) {
 								if (item.get_global_linear_id() < items) {
-									unsigned long z = item.get_global_linear_id() + offset;
-									auto i = permutation_acc[z];
+									unsigned long i = item.get_global_linear_id() + offset;
 									const double currentDiagonal = matrixDiagonal_acc[i]; // Current diagonal value
 									double sum = rv_acc[i]; // RHS value
 									for (int j = 0; j < nonzerosinrow_acc[i]; j++) {
@@ -206,6 +182,21 @@ int ComputeSYMGS_SyCL(SparseMatrix &A, const Vector &r, Vector &x) {
 									xv_acc[i] = (sum) / currentDiagonal;
 								}
 							});
+//					cgh.parallel_for<class symgsTranposed>(
+//							sycl::nd_range<1>(items, 32),
+//							[=](sycl::nd_item<1> item) {
+//								if (item.get_global_linear_id() < items) {
+//									unsigned long z = item.get_global_linear_id() + offset;
+//									auto i = permutation_acc[z];
+//									const double currentDiagonal = matrixDiagonal_acc[i]; // Current diagonal value
+//									double sum = rv_acc[i]; // RHS value
+//									for (int j = 0; j < nonzerosinrow_acc[i]; j++) {
+//										sum -= matrix_acc[j][i] * xv_acc[mtxIndL_acc[j][i]];
+//									}
+//									sum += xv_acc[i] * currentDiagonal;
+//									xv_acc[i] = (sum) / currentDiagonal;
+//								}
+//							});
 				}
 			});
 		}

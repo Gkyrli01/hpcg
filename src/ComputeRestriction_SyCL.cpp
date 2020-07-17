@@ -46,10 +46,10 @@
 */
 int ComputeRestriction_SyCL(const SparseMatrix &A, const Vector &rf) {
 	local_int_t nc = A.mgData->rc->localLength;
-	auto f2c_buf=*A.mgData->f2cOperator;
-	auto rfv_buf=rf.buf;
-	auto axfv_buf=A.mgData->Axf->buf;
-	auto results_buf=A.mgData->rc->buf;
+	auto f2c_buf = A.mgData->f2cOperator;
+	auto rfv_buf = rf.buf;
+	auto axfv_buf = A.mgData->Axf->buf;
+	auto results_buf = A.mgData->rc->buf;
 	{
 		queue.submit([&](sycl::handler &cgh) {
 			auto axfv_acc = axfv_buf.get_access<sycl::access::mode::read>(cgh);
@@ -60,8 +60,8 @@ int ComputeRestriction_SyCL(const SparseMatrix &A, const Vector &rf) {
 					sycl::nd_range<1>(nc, 8),
 					[=](sycl::nd_item<1> item) {
 						int i = item.get_global_linear_id();
-						local_int_t f2c=f2c_acc[i];
-							results_acc[i] = rfv_acc[f2c] - axfv_acc[f2c];
+						local_int_t f2c = f2c_acc[i];
+						results_acc[i] = rfv_acc[f2c] - axfv_acc[f2c];
 					});
 		});
 	}

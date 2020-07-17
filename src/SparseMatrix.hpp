@@ -45,6 +45,7 @@ struct SparseMatrix_STRUCT {
 							matrixValuesBT(sycl::buffer<double ,2>(sycl::range<2>(1,1))),
 							mtxIndLBT(sycl::buffer<local_int_t ,2>(sycl::range<2>(1,1))){
 	}
+
 	char *title; //!< name of the sparse matrix
 	Geometry *geom; //!< geometry associated with this matrix
 	global_int_t totalNumberOfRows; //!< total number of matrix rows across all processes
@@ -83,6 +84,8 @@ struct SparseMatrix_STRUCT {
 	mutable struct SparseMatrix_STRUCT *Ac; // Coarse grid matrix
 	mutable MGData *mgData; // Pointer to the coarse level data for this fine matrix
 	void *optimizationData;  // pointer that can be used to store implementation-specific data
+	void *optimizationDataOpposite;  // pointer that can be used to store implementation-specific data
+
 	void *numberOfColors;
 	int allColors;
 #ifndef HPCG_NO_MPI

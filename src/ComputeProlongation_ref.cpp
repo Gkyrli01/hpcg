@@ -35,7 +35,7 @@ int ComputeProlongation_ref(const SparseMatrix & Af, Vector & xf) {
 	double * xfv = xf.values;
 	double * xcv = Af.mgData->xc->values;
 
-	auto access=Af.mgData->f2cOperator->get_access<sycl::access::mode::read>();
+	auto access=Af.mgData->f2cOperator.get_access<sycl::access::mode::read>();
 	local_int_t * f2c=access.get_pointer();
 	local_int_t nc = Af.mgData->rc->localLength;
 

@@ -42,8 +42,7 @@
   @return Returns zero on success and a non-zero value otherwise.
 */
 int ComputeProlongation_SyCL(const SparseMatrix &Af, Vector &xf) {
-	auto f2c_buf = *Af.mgData->f2cOperator;
-
+	auto f2c_buf = Af.mgData->f2cOperator;
 
 	local_int_t nc = Af.mgData->rc->localLength;
 	auto xfv_buf = xf.buf;
@@ -64,6 +63,5 @@ int ComputeProlongation_SyCL(const SparseMatrix &Af, Vector &xf) {
 	}
 	if (doAccess)
 		auto access = xfv_buf.get_access<sycl::access::mode::read>();
-
 	return 0;
 }

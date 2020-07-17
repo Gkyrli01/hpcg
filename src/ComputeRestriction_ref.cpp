@@ -37,7 +37,7 @@ int ComputeRestriction_ref(const SparseMatrix & A, const Vector & rf) {
 	double * Axfv = A.mgData->Axf->values;
 	double * rfv = rf.values;
 	double * rcv = A.mgData->rc->values;
-	auto access=A.mgData->f2cOperator->get_access<sycl::access::mode::read>();
+	auto access=A.mgData->f2cOperator.get_access<sycl::access::mode::read>();
 	local_int_t * f2c=access.get_pointer();
 	local_int_t nc = A.mgData->rc->localLength;
 
