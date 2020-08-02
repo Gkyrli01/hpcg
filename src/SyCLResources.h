@@ -22,7 +22,7 @@ extern BufferFactory dotFactory;
 extern bool doAccess;
 extern std::map<int, double *> dotProductArrays;
 extern bool dotAccess;
-
+extern  bool goEasyOnFwd;
 extern bool transpose;
 
 extern SyCLBufferContainer<local_int_t **, local_int_t, 2> *integerBuffers2D;

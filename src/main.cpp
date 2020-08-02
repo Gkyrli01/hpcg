@@ -281,8 +281,11 @@ int main(int argc, char *argv[]) {
 	double opt_worst_time = 0.0;
 
 	std::vector<double> opt_times(9, 0.0);
+//	cl::sycl::property_list propList{cl::sycl::property::queue::enable_profiling()};
+//	queue=sycl::queue(neo,propList);
 	transpose= true;
-	ReorderAll(A,data,b,x,xexact,1);
+	if(transpose)
+		ReorderAll(A,data,b,x,xexact,1);
 //	ReorderAll(A,data,b,x,xexact,1);
 
 	doAccess = false;

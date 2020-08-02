@@ -22,7 +22,11 @@
 #include "OptimizeProblem.hpp"
 
 
-int HpcgColoring(local_int_t **graph, int rows, char *nonzeros, int *colors) {
+void
+SetColorPermutation(int nrow, const int *colors, const int *permutation, const int *permutationOpposite, int newIndex,
+					const int *numberOfColors, int m);
+
+int HpcgColoring(local_int_t **graph, int rows, char *nonzeros, int *colors, int val) {
 	int maxVertexColor = -1;
 	int maxcolor = -1;
 	for (int i = 0; i < rows; ++i) {
@@ -31,11 +35,26 @@ int HpcgColoring(local_int_t **graph, int rows, char *nonzeros, int *colors) {
 		for (int j = 0; j < nonzeros[i]; ++j) {
 			local_int_t neighbour = graph[i][j];
 			if (neighbour != i) {
-//				if (colors[neighbour] > maxcolor && neighbour < i)
-//					maxcolor = colors[neighbour];
+//				if(neighbour==(i-1) ||neighbour==(i+1)||neighbour==(i+val)||neighbour==(i-val)||neighbour==(i+val*val)||neighbour==(i-val*val) ) {
+//					if (colors[neighbour] > maxcolor && neighbour < i)
+//						maxcolor = colors[neighbour];
+
 				neighbourColors.push_back(colors[neighbour]);
+//				}
 			}
 		}
+//		if (i + 2 < rows)
+//			neighbourColors.push_back(colors[i + 2]);
+//		if (i - 2 >= 0)
+//			neighbourColors.push_back(colors[i - 2]);
+
+		//		if(i==20000){
+//			std::cout<<neighbourColors.size()<<"\n";
+//			for (int j = 0; j <  nonzeros[i]; ++j) {
+//				std::cout<<"Neighbour: "<<graph[0][j]<<"\n";
+//			}
+//		}
+//		std::cout<<neighbourColors.size()<<"\n";
 		bool VertexColored = false;
 		int VertexColor = 1; // We init all vertices to color=1
 
@@ -74,6 +93,20 @@ int HpcgColoring(local_int_t **graph, int rows, char *nonzeros, int *colors) {
 	return maxVertexColor;
 }
 
+
+
+void
+SetColorPermutation(int nrow, const int *colors,  int *&permutation,  int *&permutationOpposite, int &newIndex,
+					int *&numberOfColors, int m) {
+	for (int l = 0; l < nrow; ++l) {
+		if (colors[l] == m) {
+			permutation[newIndex] = l;
+			permutationOpposite[l] = newIndex;
+			newIndex++;
+			numberOfColors[m - 1]++;
+		}
+	}
+}
 
 /*!
   Optimizes the data structures used for CG iteration to increase the
@@ -118,7 +151,7 @@ int OptimizeProblem(SparseMatrix &A, CGData &data, Vector &b, Vector &x, Vector 
 
 	for (int k = 0; k < nrow; ++k) {
 		permutation[k] = -1;
-		permutationOpposite[k]=-1;
+		permutationOpposite[k] = -1;
 	}
 	std::cout << "Optimizing 1" << std::endl;
 
@@ -128,8 +161,10 @@ int OptimizeProblem(SparseMatrix &A, CGData &data, Vector &b, Vector &x, Vector 
 	char *nonzeros = access.get_pointer();
 	while (allcolors != prevColors) {
 		prevColors = allcolors;
-		allcolors = HpcgColoring(A.mtxIndL, nrow, nonzeros, colors);
-//		std::cout<<allcolors<<std::endl;
+//		std::cout<<A.geom->nx<<std::endl;
+
+		allcolors = HpcgColoring(A.mtxIndL, nrow, nonzeros, colors, A.geom->nx);
+		std::cout << allcolors << std::endl;
 	}
 	std::cout << "Optimizing 2" << std::endl;
 
@@ -142,16 +177,43 @@ int OptimizeProblem(SparseMatrix &A, CGData &data, Vector &b, Vector &x, Vector 
 	}
 	std::cout << "Optimizing 3" << std::endl;
 
-	for (int m = 1; m <= allcolors; ++m) {
-		for (int l = 0; l < nrow; ++l) {
-			if (colors[l] == m) {
-				permutation[newIndex] = l;
-				permutationOpposite[l]=newIndex;
-				newIndex++;
-				numberOfColors[m - 1]++;
-			}
-		}
-	}
+//	for (int m = allcolors; m >=1; --m) {
+
+//This is best! with 54 iterations to convergence!
+	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 1);
+	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 8);
+	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 2);
+	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 7);
+
+	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 3);
+	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 6);
+	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 4);
+	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 5);
+//	}
+//The opposite strategies are not very good really
+
+//Another one with 54
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 1);
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 4);
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 7);
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 2);
+//
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 5);
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 8);
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 3);
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 6);
+//Change by 5s is 54 again
+
+
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 3);
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 6);
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 1);
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 4);
+//
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 7);
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 2);
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 5);
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 8);
 	std::cout << "Optimizing 4" << std::endl;
 
 	A.optimizationData = permutation;
@@ -232,6 +294,7 @@ int OptimizeProblem(SparseMatrix &A, CGData &data, Vector &b, Vector &x, Vector 
 	return 0;
 }
 
+
 //		{
 //			auto non = A.nonzerosInRow.get_access<sycl::access::mode::read>();
 //
@@ -262,16 +325,39 @@ int ReorderAll(SparseMatrix &A, CGData &data, Vector &b, Vector &x, Vector &xexa
 	if (A.Ac) {
 		permutationnext = static_cast<local_int_t *>(A.Ac->optimizationData);
 	}
-	PermuteMatrixAndContents(A.mtxIndLBT, permutation, A.localNumberOfRows);
+
+	PermuteMatrixAndContents(A.mtxIndLBT, permutation, A.localNumberOfRows, A.nonzerosInRow);
 	{
-		auto a=A.mtxIndLBT.get_access<sycl::access::mode::read>();
+		auto a = A.mtxIndLBT.get_access<sycl::access::mode::read>();
+		auto c = A.nonzerosInRow.get_access<sycl::access::mode::read>();
+		for (int i = 0; i < 27; ++i) {
+			std::cout << a[i][1000] << " ";
+
+		}
+		std::cout << "\n";
+		for (int i = 0; i < 27; ++i) {
+			std::cout << a[i][1001] << " ";
+
+		}
+//		for (int i = 0; i < A.localNumberOfRows; ++i) {
+//			for (int j = i+1; j < 9; ++j) {
+//				if(vals[i]>vals[j]){
+//					auto tmp=vals[i];
+//					vals[i]=vals[j];
+//					vals[j]=tmp;
+//				}
+//			}
+//		}
+
 	}
-	PermuteMatrix(A.matrixValuesBT, permutation, A.localNumberOfRows);
+
+	PermuteMatrix(A.matrixValuesBT, permutation, A.localNumberOfRows, A.nonzerosInRow);
 	{
-		auto a=A.matrixValuesBT.get_access<sycl::access::mode::read>();
+		auto a = A.matrixValuesBT.get_access<sycl::access::mode::read>();
 	}
-	PermuteVector(A.matrixDiagonalSYMGS, permutation, A.localNumberOfRows);
 	PermuteVector(A.nonzerosInRow, permutation, A.localNumberOfRows);
+
+	PermuteVector(A.matrixDiagonalSYMGS, permutation, A.localNumberOfRows);
 
 	if (firstLevel) {
 		PermuteVector(x.buf, permutation, x.localLength);
@@ -285,18 +371,21 @@ int ReorderAll(SparseMatrix &A, CGData &data, Vector &b, Vector &x, Vector &xexa
 //
 	if (A.mgData) {
 		{
-			auto vals=A.mgData->f2cOperator.get_access<sycl::access::mode::read>();
+			auto vals = A.mgData->f2cOperator.get_access<sycl::access::mode::read>();
 			for (int i = 0; i < 10; ++i) {
-				std::cout<<permutation[vals[permutationnext[i]]]<<"  f2c |Permutation: "<<permutationnext[i]<<"|New value" <<permutation[vals[i]]<<"|Another value" <<
-			    permutation[vals[i]]<<"\n";
+				std::cout << permutation[vals[permutationnext[i]]] << "  f2c |Permutation: " << permutationnext[i]
+						  << "|New value" << permutation[vals[i]] << "|Another value" <<
+						  permutation[vals[i]] << "\n";
 			}
 		}
-		PermuteFine2Coarse(A.mgData->f2cOperator,permutation,permutationnext,A.localNumberOfRows,A.mgData->rc->localLength);
+		PermuteFine2Coarse(A.mgData->f2cOperator, permutation, permutationnext, A.localNumberOfRows,
+						   A.mgData->rc->localLength);
 		{
-			auto vals=A.mgData->f2cOperator.get_access<sycl::access::mode::read>();
+			auto vals = A.mgData->f2cOperator.get_access<sycl::access::mode::read>();
 			for (int i = 0; i < 10; ++i) {
-				std::cout<<vals[permutationnext[i]]<<"  f2c |Permutation: "<<vals[i]<<"|New value" <<permutation[vals[i]]<<"|Another value" <<
-						 vals[i]<<"\n";
+				std::cout << vals[permutationnext[i]] << "  f2c |Permutation: " << vals[i] << "|New value"
+						  << permutation[vals[i]] << "|Another value" <<
+						  vals[i] << "\n";
 			}
 		}
 

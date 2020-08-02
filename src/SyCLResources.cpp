@@ -5,7 +5,10 @@
 #include "SyCLResources.h"
 
 cl::sycl::gpu_selector neo;
-sycl::queue queue(neo);
+cl::sycl::cpu_selector cpu;
+
+cl::sycl::property_list propList{cl::sycl::property::queue::enable_profiling()};
+sycl::queue queue(neo,propList);
 std::map<int, double *> dotProductArrays;
 
 BufferFactory bufferFactory;
@@ -14,7 +17,7 @@ BufferFactory dotFactory;
 bool doAccess= true;
 bool dotAccess= true;
 bool transpose= false;
-
+bool goEasyOnFwd= false;
 SyCLBufferContainer<local_int_t **, local_int_t, 2> *integerBuffers2D= new SyCLBufferContainer<local_int_t **, local_int_t, 2>();
 SyCLBufferContainer<local_int_t *, local_int_t, 1> *integerBuffers1D=new SyCLBufferContainer<local_int_t *, local_int_t, 1>();
 SyCLBufferContainer<char *, char, 1> *charBuffers1D=new SyCLBufferContainer<char *, char, 1> ();

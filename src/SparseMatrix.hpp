@@ -57,7 +57,7 @@ struct SparseMatrix_STRUCT {
 	sycl::buffer<char, 1> nonzerosInRow;
 //	sycl::buffer<global_int_t,2>*mtxIndG;
 	sycl::buffer<double, 1> matrixDiagonalSYMGS;
-	sycl::buffer<double, 2> matrixValuesB;
+	sycl::buffer<cl::sycl::cl_double , 2> matrixValuesB;
 	sycl::buffer<local_int_t, 2> mtxIndLB;
 
 	sycl::buffer<double, 2> matrixValuesBT;

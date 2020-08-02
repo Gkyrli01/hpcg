@@ -50,7 +50,7 @@ void ThreadPerRowSpMV(sycl::queue &queue, sycl::buffer<double, 2> &matrixbuf, sy
 		auto xvAccessor = xBuf.get_access<sycl::access::mode::read>(cgh);
 		auto results = groups.get_access<sycl::access::mode::write>(cgh);
 		if(!transpose)
-		cgh.parallel_for<class reduction_kernel>(
+		cgh.parallel_for<class spmv_kernel>(
 				sycl::nd_range<1>(rows, wgroup_size),
 				[=](sycl::nd_item<1> item) {
 					size_t globalLinearId = item.get_global_linear_id();
@@ -61,7 +61,7 @@ void ThreadPerRowSpMV(sycl::queue &queue, sycl::buffer<double, 2> &matrixbuf, sy
 						results[globalLinearId] = sum;
 				});
 		else
-			cgh.parallel_for<class transposed_reduction_kernel>(
+			cgh.parallel_for<class transposed_spmv_kernel>(
 					sycl::nd_range<1>(rows, wgroup_size),
 					[=](sycl::nd_item<1> item) {
 						size_t globalLinearId = item.get_global_linear_id();

@@ -69,6 +69,7 @@ int ComputeMG_SyCL(SparseMatrix &A, const Vector &r, Vector &x) {
 	assert(x.localLength == A.localNumberOfColumns); // Make sure x contain space for halo values
 
 	SyCLZeroVector(x);
+	goEasyOnFwd=true;
 //	ZeroVector(x); // initialize x to zero
 
 	int ierr = 0;
