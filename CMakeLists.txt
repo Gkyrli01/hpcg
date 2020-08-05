@@ -44,7 +44,7 @@ set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS} )
 set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl -Ofast")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffp-contract=fast -fsycl -fsycl-targets=nvptx64-nvidia-cuda-sycldevice -Ofast")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -fsycl -fsycl-targets=nvptx64-nvidia-cuda-sycldevice -Ofast")
 
 
 include_directories(src)

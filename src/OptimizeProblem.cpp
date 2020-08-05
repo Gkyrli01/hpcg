@@ -19,6 +19,8 @@
  */
 
 #include <iostream>
+#include <random>
+#include <zconf.h>
 #include "OptimizeProblem.hpp"
 
 
@@ -29,6 +31,8 @@ SetColorPermutation(int nrow, const int *colors, const int *permutation, const i
 int HpcgColoring(local_int_t **graph, int rows, char *nonzeros, int *colors, int val) {
 	int maxVertexColor = -1;
 	int maxcolor = -1;
+	int idx=0;
+
 	for (int i = 0; i < rows; ++i) {
 		std::vector<local_int_t> neighbourColors;
 		maxcolor = -1;
@@ -55,8 +59,13 @@ int HpcgColoring(local_int_t **graph, int rows, char *nonzeros, int *colors, int
 //			}
 //		}
 //		std::cout<<neighbourColors.size()<<"\n";
+//		std::reverse(neighbourColors.begin(),neighbourColors.end());
+//		std::vector<short> cols({1,2,3,4,5,6,7,8});
+//		std::shuffle(cols.begin(),cols.end(), std::mt19937(std::random_device()()));
+//		std::cout<<i<<" \n";
 		bool VertexColored = false;
-		int VertexColor = 1; // We init all vertices to color=1
+		int VertexColor= 1; // We init all vertices to color=1
+		idx=((idx+3)%8);
 
 		if (maxcolor != -1)
 			VertexColor = maxcolor;
@@ -68,6 +77,8 @@ int HpcgColoring(local_int_t **graph, int rows, char *nonzeros, int *colors, int
 			std::vector<local_int_t>::iterator it;
 			for (it = neighbourColors.begin(); it != neighbourColors.end(); it++) {
 				if (*it == VertexColor) {
+//					std::cout<<VertexColor<<"is the dix \n";
+
 					IsNeighborColor = true;
 					break;
 				}
@@ -83,6 +94,9 @@ int HpcgColoring(local_int_t **graph, int rows, char *nonzeros, int *colors, int
 			} else {
 				// Try with the next color
 				VertexColor++;
+//				std::cout<<idx<<"is the dix \n";
+
+				idx=((idx+3)%16);
 			}
 		}
 
@@ -94,9 +108,8 @@ int HpcgColoring(local_int_t **graph, int rows, char *nonzeros, int *colors, int
 }
 
 
-
 void
-SetColorPermutation(int nrow, const int *colors,  int *&permutation,  int *&permutationOpposite, int &newIndex,
+SetColorPermutation(int nrow, const int *colors, int *&permutation, int *&permutationOpposite, int &newIndex,
 					int *&numberOfColors, int m) {
 	for (int l = 0; l < nrow; ++l) {
 		if (colors[l] == m) {
@@ -123,6 +136,9 @@ SetColorPermutation(int nrow, const int *colors,  int *&permutation,  int *&perm
   @see GenerateGeometry
   @see GenerateProblem
 */
+
+int level = 0;
+
 int OptimizeProblem(SparseMatrix &A, CGData &data, Vector &b, Vector &x, Vector &xexact) {
 
 	A.matrixValuesBT = sycl::buffer<double, 2>(sycl::range<2>(27, A.localNumberOfRows));
@@ -177,9 +193,20 @@ int OptimizeProblem(SparseMatrix &A, CGData &data, Vector &b, Vector &x, Vector 
 	}
 	std::cout << "Optimizing 3" << std::endl;
 
-//	for (int m = allcolors; m >=1; --m) {
-
+//	for (int m = 1; m <=allcolors; ++m) {
+//		SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, m);
+//	}
 //This is best! with 54 iterations to convergence!
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 1);
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 8);
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 7);
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 2);
+//
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 3);
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 6);
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 5);
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 4);
+
 	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 1);
 	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 8);
 	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 2);
@@ -189,19 +216,17 @@ int OptimizeProblem(SparseMatrix &A, CGData &data, Vector &b, Vector &x, Vector 
 	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 6);
 	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 4);
 	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 5);
-//	}
-//The opposite strategies are not very good really
 
 //Another one with 54
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 1);
 //	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 4);
 //	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 7);
 //	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 2);
-//
 //	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 5);
+//
 //	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 8);
 //	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 3);
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 6);
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 7);
+//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 1);
 //Change by 5s is 54 again
 
 
@@ -325,8 +350,15 @@ int ReorderAll(SparseMatrix &A, CGData &data, Vector &b, Vector &x, Vector &xexa
 	if (A.Ac) {
 		permutationnext = static_cast<local_int_t *>(A.Ac->optimizationData);
 	}
+//	usleep(2000000);
 
-	PermuteMatrixAndContents(A.mtxIndLBT, permutation, A.localNumberOfRows, A.nonzerosInRow);
+	PermuteMatrix(A.matrixValuesBT, permutation, A.localNumberOfRows, A.nonzerosInRow);
+	{
+		auto a = A.matrixValuesBT.get_access<sycl::access::mode::read>();
+	}
+//	usleep(1000000);
+
+	PermuteMatrixAndContents(A.mtxIndLBT, permutation, A.localNumberOfRows, A.nonzerosInRow, A.matrixValuesBT);
 	{
 		auto a = A.mtxIndLBT.get_access<sycl::access::mode::read>();
 		auto c = A.nonzerosInRow.get_access<sycl::access::mode::read>();
@@ -339,22 +371,11 @@ int ReorderAll(SparseMatrix &A, CGData &data, Vector &b, Vector &x, Vector &xexa
 			std::cout << a[i][1001] << " ";
 
 		}
-//		for (int i = 0; i < A.localNumberOfRows; ++i) {
-//			for (int j = i+1; j < 9; ++j) {
-//				if(vals[i]>vals[j]){
-//					auto tmp=vals[i];
-//					vals[i]=vals[j];
-//					vals[j]=tmp;
-//				}
-//			}
-//		}
+
 
 	}
 
-	PermuteMatrix(A.matrixValuesBT, permutation, A.localNumberOfRows, A.nonzerosInRow);
-	{
-		auto a = A.matrixValuesBT.get_access<sycl::access::mode::read>();
-	}
+
 	PermuteVector(A.nonzerosInRow, permutation, A.localNumberOfRows);
 
 	PermuteVector(A.matrixDiagonalSYMGS, permutation, A.localNumberOfRows);

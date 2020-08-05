@@ -8,7 +8,9 @@ cl::sycl::gpu_selector neo;
 cl::sycl::cpu_selector cpu;
 
 cl::sycl::property_list propList{cl::sycl::property::queue::enable_profiling()};
-sycl::queue queue(neo,propList);
+//sycl::queue queue(neo,propList);
+sycl::queue queue(neo);
+
 std::map<int, double *> dotProductArrays;
 
 BufferFactory bufferFactory;

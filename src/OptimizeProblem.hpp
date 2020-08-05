@@ -29,7 +29,7 @@ double OptimizeProblemMemoryUse(const SparseMatrix &A);
 
 template<typename T>
 inline void PermuteVector(sycl::buffer<T, 1> &buf, local_int_t *permutation, int len) {
-	auto nbuf = sycl::buffer<T, 1>(sycl::range<1>(len));
+	auto nbuf = sycl::buffer<T, 1>(sycl::range<1>(buf.get_count()));
 	{
 		std::cout << len << "\n";
 		auto permutation_buf = *(bufferFactory.GetBuffer(permutation, sycl::range<1>(len)));
@@ -48,9 +48,15 @@ inline void PermuteVector(sycl::buffer<T, 1> &buf, local_int_t *permutation, int
 							reordered[i] = bufAcc[z];
 						}
 					});
+			queue.wait_and_throw();
 		});
 	}
-//	nbuf.template get_access<sycl::access::mode::read>();
+	auto a=nbuf.template get_access<sycl::access::mode::read>();
+//	buf= nullptr;
+//	auto a=nbuf.template get_access<sycl::access::mode::read>();
+//	buf= nullptr;
+	buf.set_write_back(false);
+	buf.set_final_data(nullptr);
 	buf = nbuf;
 }
 
@@ -58,7 +64,7 @@ inline void PermuteVector(sycl::buffer<T, 1> &buf, local_int_t *permutation, int
 inline void
 PermuteFine2Coarse(sycl::buffer<local_int_t, 1> &buf, local_int_t *permutation, local_int_t *permutation2, int len,
 				   int len2) {
-	auto nbuf = sycl::buffer<local_int_t, 1>(sycl::range<1>(len));
+	auto nbuf = sycl::buffer<local_int_t, 1>(sycl::range<1>(len2));
 	{
 		std::cout << len << " of fine \n";
 		std::cout << len2 << " of coarse \n";
@@ -76,8 +82,14 @@ PermuteFine2Coarse(sycl::buffer<local_int_t, 1> &buf, local_int_t *permutation, 
 						reordered[permutationnext[z]]=permutation_acc[bufAcc[z]];
 //						reordered[z] = permutation_acc[bufAcc[permutationnext[z]]];
 					});
+			queue.wait_and_throw();
+
 		});
 	}
+	auto a=nbuf.template get_access<sycl::access::mode::read>();
+//	buf= nullptr;
+	buf.set_write_back(false);
+	buf.set_final_data(nullptr);
 	buf = nbuf;
 }
 
@@ -131,20 +143,26 @@ inline void PermuteMatrix(sycl::buffer<T, 2> &buf, local_int_t *permutation, int
 							}
 						}
 					});
+			queue.wait_and_throw();
 		});
 	}
+	auto a=nbuf.template get_access<sycl::access::mode::read>();
+//	buf= 0;
+	buf.set_write_back(false);
+	buf.set_final_data(nullptr);
+
 	buf = nbuf;
 }
 
 template<typename T>
-inline void PermuteMatrixAndContents(sycl::buffer<T, 2> &buf,local_int_t *permutation, int len,sycl::buffer<char , 1> &nonzeros) {
+inline void PermuteMatrixAndContents(sycl::buffer<T, 2> &buf,local_int_t *permutation, int len,sycl::buffer<char , 1> &nonzeros,sycl::buffer<double , 2> &matrixValues) {
 	auto nbuf = sycl::buffer<T, 2>(sycl::range<2>(27, len));
 	{
 		auto permutation_buf = *(bufferFactory.GetBuffer(permutation, sycl::range<1>(len)));
-
 		queue.submit([&](sycl::handler &cgh) {
 			auto bufAcc = buf.template get_access<sycl::access::mode::read>(cgh);
 			auto reordered = nbuf.template get_access<sycl::access::mode::write>(cgh);
+			auto reorderValues=matrixValues.get_access<sycl::access::mode::read_write>(cgh);
 			auto permutation_acc = permutation_buf.get_access<sycl::access::mode::read>(cgh);
 			auto nonzeros_acc = nonzeros.get_access<sycl::access::mode::read>(cgh);
 
@@ -160,22 +178,29 @@ inline void PermuteMatrixAndContents(sycl::buffer<T, 2> &buf,local_int_t *permut
 								else
 									reordered[j][i] = 0;
 							}
-//							char nonzeroes=nonzeros_acc[z];
-//							for (int k = 0; k < nonzeroes; ++k) {
-//								for (int j = k+1; j < nonzeroes; ++j) {
-//									if(reordered[k][i]>reordered[j][i]){
-//										auto tmp=reordered[k][i];
-//										reordered[k][i]=reordered[j][i];
-//										reordered[j][i]=tmp;
-//									}
-//								}
-//							}
+							char nonzeroes=nonzeros_acc[z];
+							for (int k = 0; k < nonzeroes; ++k) {
+								for (int j = k+1; j < nonzeroes; ++j) {
+									if(reordered[k][i]>reordered[j][i]){
+										auto tmp=reordered[k][i];
+										auto tmp2=reorderValues[k][i];
+										reordered[k][i]=reordered[j][i];
+										reorderValues[k][i]=reorderValues[j][i];
+										reordered[j][i]=tmp;
+										reorderValues[j][i]=tmp2;
+									}
+								}
+							}
 						}
 					});
+			queue.wait_and_throw();
+
 		});
 	}
-
-
+	auto a=nbuf.template get_access<sycl::access::mode::read>();
+//	buf= nullptr;
+	buf.set_write_back(false);
+	buf.set_final_data(nullptr);
 	buf = nbuf;
 }
 

@@ -31,46 +31,6 @@
 #include <cassert>
 #include <iostream>
 
-void DoAccess(double *xv, double *rv, int nrow, local_int_t **pInt, double **pDouble, double **pDouble1,
-			  char *string, int *pInt1) {
-//	auto a1 = (doubleBuffers1D->GetBuffer(xv, sycl::range<1>(
-//			nrow)))->get_access<sycl::access::mode::read>();
-//	auto a2 = (doubleBuffers1D->GetBuffer(rv, sycl::range<1>(nrow)))->get_access<sycl::access::mode::read>();
-//
-//	auto a3 = (integerBuffers2D->GetBuffer(pInt, sycl::range<2>(nrow,27)))->get_access<sycl::access::mode::read>();
-//	auto a4= (doubleBuffers2D->GetBuffer(pDouble, sycl::range<2>(nrow,27)))->get_access<sycl::access::mode::read>();
-//	auto a5= (doubleBuffers2D->GetBuffer(pDouble1, sycl::range<2>(nrow,1)))->get_access<sycl::access::mode::read>();
-//	auto a6 = (charBuffers1D->GetBuffer(string, sycl::range<1>(
-//			nrow)))->get_access<sycl::access::mode::read>();
-//	auto a7 = (integerBuffers1D->GetBuffer(pInt1, sycl::range<1>(nrow)))->get_access<sycl::access::mode::read>();
-
-}
-
-//template<typename T,typename T1, int dims,sycl::access::mode Mode>
-//sycl::accessor<T1,dims,Mode> GetVals(T arr, sycl::range<dims> range,sycl::handler& cgh){
-//
-//	if (strcmp(typeid(T1).name(), "char") == 1) {
-//		return charBuffers1D->GetBuffer(arr, range)->template get_access<Mode>(cgh);
-//	} else if (typeid(T1).name(), "double") {
-//		if (dims == 2) {
-//			return doubleBuffers2D->GetBuffer(arr, range)->template get_access<Mode>(cgh);
-//		} else {
-//			return doubleBuffers1D->GetBuffer(arr, range)->template get_access<Mode>(cgh);
-//		}
-//	} else {
-//		if (dims == 2) {
-//			return integerBuffers2D->GetBuffer(arr, range)->template get_access<Mode>(cgh);
-//		} else {
-//			return integerBuffers1D->GetBuffer(arr, range)->template get_access<Mode>(cgh);
-//		}
-//	}
-//}
-//template<typename type, int dims>
-//sycl::buffer<char, dims> GetBuffer(type *arr, sycl::range<dims> range) {
-//	return sycl::buffer<type, dims>(arr, range);
-//}
-
-
 /*!
   Computes one step of symmetric Gauss-Seidel:
 
@@ -177,7 +137,7 @@ int ComputeSYMGS_SyCL(SparseMatrix &A, const Vector &r, Vector &x) {
 										unsigned long i = item.get_global_linear_id() + offset;
 //									const double currentDiagonal = matrixDiagonal_acc[i]; // Current diagonal value
 										double sum = rv_acc[i]; // RHS value
-										double currentDiagonal = 0;
+//										double currentDiagonal = 0;
 										double val;int col;
 										for (int j = 0; j < nonzerosinrow_acc[i]; j++) {
 											 col = mtxIndL_acc[j][i];
@@ -188,17 +148,19 @@ int ComputeSYMGS_SyCL(SparseMatrix &A, const Vector &r, Vector &x) {
 											else {
 												if (col == i) {
 													val = matrix_acc[j][i];
-													currentDiagonal = val;
+													xv_acc[i] = (sum) / val;
+//
+//													currentDiagonal = val;
+													break;
 												}
 											}
 										}
 //									sum += xv_acc[i] * currentDiagonal;
-										xv_acc[i] = (sum) / currentDiagonal;
 									}
 								});
 					} else {
 						cgh.parallel_for<class symgsTranposed>(
-								sycl::nd_range<1>(items, 32),
+								sycl::nd_range<1>(items, 64),
 								[=](sycl::nd_item<1> item) {
 									if (item.get_global_linear_id() < items) {
 										unsigned long i = item.get_global_linear_id() + offset;
@@ -208,8 +170,9 @@ int ComputeSYMGS_SyCL(SparseMatrix &A, const Vector &r, Vector &x) {
 										for (int j = 0; j < nonzerosinrow_acc[i]; j++) {
 											auto col = mtxIndL_acc[j][i];
 											auto val = matrix_acc[j][i];
-											if (col != i)
-												sum -= val * xv_acc[col];
+											auto check=col != i;
+											if (check)
+												sum =sum- val * xv_acc[col];
 											else
 												currentDiagonal = val;
 										}
@@ -217,6 +180,31 @@ int ComputeSYMGS_SyCL(SparseMatrix &A, const Vector &r, Vector &x) {
 										xv_acc[i] = (sum) / currentDiagonal;
 									}
 								});
+
+
+//						for (int k = 0; k < size; ++k) {
+//							size_t id =
+//									item.get_global_linear_id() +
+//									(item.get_global_linear_id() / (wgroup)) * val +
+//									k * wgroup;
+//
+//							if (id < items) {
+//								unsigned long i = id + offset;
+////									const double currentDiagonal = matrixDiagonal_acc[i]; // Current diagonal value
+//								double sum = rv_acc[i]; // RHS value
+//								double currentDiagonal = 0;
+//								for (int j = 0; j < nonzerosinrow_acc[i]; j++) {
+//									auto col = mtxIndL_acc[j][i];
+//									auto val = matrix_acc[j][i];
+//									if (col != i)
+//										sum -= val * xv_acc[col];
+//									else
+//										currentDiagonal = val;
+//								}
+////									sum += xv_acc[i] * currentDiagonal;
+//								xv_acc[i] = (sum) / currentDiagonal;
+//							}
+//						}
 					}
 
 //					cgh.parallel_for<class symgsTranposed>(

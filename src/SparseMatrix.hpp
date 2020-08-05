@@ -60,7 +60,7 @@ struct SparseMatrix_STRUCT {
 	sycl::buffer<cl::sycl::cl_double , 2> matrixValuesB;
 	sycl::buffer<local_int_t, 2> mtxIndLB;
 
-	sycl::buffer<double, 2> matrixValuesBT;
+	sycl::buffer<cl_double, 2> matrixValuesBT;
 	sycl::buffer<local_int_t, 2> mtxIndLBT;
 
 
@@ -104,7 +104,7 @@ typedef struct SparseMatrix_STRUCT SparseMatrix;
 /*!
   Initializes the known system matrix data structure members to 0.
 
-  @param[in] A the known system matrix
+  @param[in] A the known s	ystem matrix
  */
 inline void InitializeSparseMatrix(SparseMatrix &A, Geometry *geom) {
 	A.title = 0;

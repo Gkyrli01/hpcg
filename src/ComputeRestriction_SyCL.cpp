@@ -56,7 +56,7 @@ int ComputeRestriction_SyCL(const SparseMatrix &A, const Vector &rf) {
 			auto rfv_acc = rfv_buf.get_access<sycl::access::mode::read>(cgh);
 			auto f2c_acc = f2c_buf.get_access<sycl::access::mode::read>(cgh);
 			auto results_acc = results_buf.get_access<sycl::access::mode::write>(cgh);
-			cgh.parallel_for<class prolongation>(
+			cgh.parallel_for<class prolongation  >(
 					sycl::nd_range<1>(nc, 8),
 					[=](sycl::nd_item<1> item) {
 						int i = item.get_global_linear_id();

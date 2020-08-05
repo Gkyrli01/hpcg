@@ -37,6 +37,7 @@ using std::cin;
 using std::endl;
 
 #include <vector>
+#include <zconf.h>
 
 #include "hpcg.hpp"
 
@@ -284,11 +285,18 @@ int main(int argc, char *argv[]) {
 //	cl::sycl::property_list propList{cl::sycl::property::queue::enable_profiling()};
 //	queue=sycl::queue(neo,propList);
 	transpose= true;
-	if(transpose)
-		ReorderAll(A,data,b,x,xexact,1);
-//	ReorderAll(A,data,b,x,xexact,1);
-
+	quickPath= false;
+//	{
+////		queue.
+////		delete queue;
+//		queue = sycl::queue(neo);
+//	}
+	if(transpose) {
+		ReorderAll(A, data, b, x, xexact, 1);
+	}
+	std::cout<<"Exits\n";
 	doAccess = false;
+//	usleep(10000000);
 	// Compute the residual reduction and residual count for the user ordering and optimized kernels.
 	for (int i = 0; i < numberOfCalls; ++i) {
 		SyCLZeroVector(x); // start x at all zeros

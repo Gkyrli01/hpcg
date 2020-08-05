@@ -125,14 +125,13 @@ template<typename T>
 void CallDotDoubleBufferKernel(sycl::queue &queue, int wgroup_size, sycl::buffer<T, 1> &buf, sycl::buffer<T, 1> &buf2,
 							   sycl::buffer<T, 1> &output,
 							   int n_wgroups, int len) {
-
 	queue.submit([&](sycl::handler &cgh) {
 		sycl::accessor<T, 1, sycl::access::mode::read_write,
 				sycl::access::target::local>
 				local_mem(sycl::range<1>(wgroup_size+32), cgh);
 		auto global_mem = buf.template get_access<sycl::access::mode::read>(cgh);
 		auto global_mem2 = buf2.template get_access<sycl::access::mode::read>(cgh);
-		auto result = output.template get_access<sycl::access::mode::write>(cgh);
+		auto result = output.template get_access<sycl::access::mode::discard_write>(cgh);
 		cgh.parallel_for<class double_dot_kernel>(
 				sycl::nd_range<1>(n_wgroups * wgroup_size, wgroup_size),
 				[=](sycl::nd_item<1> item) {
@@ -201,7 +200,7 @@ int ReturnArrayWithPad(double *&arr, int *originalLength, int modulo) {
 
   @see ComputeDotProduct
 */
-int ComputeDotProduct_SyCL(const local_int_t n, const Vector &x, const Vector &y,
+int ComputeDotProduct_SyCL(const local_int_t n,  Vector &x,  Vector &y,
 						   double &result, double &time_allreduce) {
 	assert(x.localLength >= n); // Test vector lengths
 	assert(y.localLength >= n);
@@ -236,21 +235,24 @@ int ComputeDotProduct_SyCL(const local_int_t n, const Vector &x, const Vector &y
 			output=dotProductArrays[1];
 			newLength = 1;
 		}
-		auto result1=*dotFactory.GetBuffer(output, sycl::range<1>(newLength));
+		auto result1=sycl::buffer<double ,1>(sycl::range<1>(newLength));               //*dotFactory.GetBuffer(output, sycl::range<1>(newLength));
 
 		if (initialLoop) {
 			if (x.buf == y.buf)
 				CallDotSingleBufferKernel<double>(queue, wgroup_size, x_buf, result1, n_wgroups, len);
 			else
-				CallDotDoubleBufferKernel<double>(queue, wgroup_size, x_buf, y_buf, result1, n_wgroups, len);
+				CallDotDoubleBufferKernel<double>(queue, wgroup_size, x.buf, y.buf, result1, n_wgroups, len);
 		} else {
 			CallReductionKernel<double>(queue, wgroup_size, x_buf, result1, n_wgroups, len);
 		}
 		initialLoop = 0;
 //		auto access = result1.get_access<sycl::access::mode::read>();
-		x_buf = *dotFactory.GetBuffer(output, sycl::range<1>(newLength));
+		queue.wait_and_throw();
+		x_buf = result1;// *dotFactory.GetBuffer(output, sycl::range<1>(newLength));
 		len = newLength;
 	}
+//	std::cout<<len<<" PreAccess\n";
+
 	auto access = x_buf.get_access<sycl::access::mode::read>();
 	result = access[0];
 //	if(dotAccess){

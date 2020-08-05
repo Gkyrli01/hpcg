@@ -39,7 +39,7 @@
 
   @see ComputeDotProduct_ref
 */
-int ComputeDotProduct(const local_int_t n, const Vector & x, const Vector & y,
+int ComputeDotProduct(const local_int_t n,  Vector & x,  Vector & y,
     double & result, double & time_allreduce, bool & isOptimized) {
 
 #if defined(SyCL_DOT)
