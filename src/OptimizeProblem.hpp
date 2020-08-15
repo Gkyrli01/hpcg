@@ -88,8 +88,8 @@ PermuteFine2Coarse(sycl::buffer<local_int_t, 1> &buf, local_int_t *permutation, 
 	}
 	auto a=nbuf.template get_access<sycl::access::mode::read>();
 //	buf= nullptr;
-	buf.set_write_back(false);
-	buf.set_final_data(nullptr);
+//	buf.set_write_back(false);
+//	buf.set_final_data(nullptr);
 	buf = nbuf;
 }
 
@@ -147,9 +147,9 @@ inline void PermuteMatrix(sycl::buffer<T, 2> &buf, local_int_t *permutation, int
 		});
 	}
 	auto a=nbuf.template get_access<sycl::access::mode::read>();
-//	buf= 0;
-	buf.set_write_back(false);
-	buf.set_final_data(nullptr);
+////	buf= 0;
+//	buf.set_write_back(false);
+//	buf.set_final_data(nullptr);
 
 	buf = nbuf;
 }
@@ -199,8 +199,8 @@ inline void PermuteMatrixAndContents(sycl::buffer<T, 2> &buf,local_int_t *permut
 	}
 	auto a=nbuf.template get_access<sycl::access::mode::read>();
 //	buf= nullptr;
-	buf.set_write_back(false);
-	buf.set_final_data(nullptr);
+//	buf.set_write_back(false);
+//	buf.set_final_data(nullptr);
 	buf = nbuf;
 }
 

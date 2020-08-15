@@ -15,7 +15,7 @@
 #ifndef COMPUTEDOTPRODUCT_SyCL_HPP
 #define COMPUTEDOTPRODUCT_SyCL_HPP
 #include "Vector.hpp"
-int ComputeDotProduct_SyCL(const local_int_t n,  Vector & x,  Vector & y,
+int ComputeDotProduct_SyCL(const local_int_t n, const Vector & x, const Vector & y,
     double & result, double & time_allreduce);
 
 #endif // COMPUTEDOTPRODUCT_REF_HPP

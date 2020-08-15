@@ -193,52 +193,10 @@ int OptimizeProblem(SparseMatrix &A, CGData &data, Vector &b, Vector &x, Vector 
 	}
 	std::cout << "Optimizing 3" << std::endl;
 
-//	for (int m = 1; m <=allcolors; ++m) {
-//		SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, m);
-//	}
-//This is best! with 54 iterations to convergence!
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 1);
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 8);
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 7);
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 2);
-//
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 3);
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 6);
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 5);
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 4);
+	for (int m = 1; m <=allcolors; ++m) {
+		SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, m);
+	}
 
-	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 1);
-	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 8);
-	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 2);
-	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 7);
-
-	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 3);
-	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 6);
-	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 4);
-	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 5);
-
-//Another one with 54
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 4);
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 7);
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 2);
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 5);
-//
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 8);
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 3);
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 7);
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 1);
-//Change by 5s is 54 again
-
-
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 3);
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 6);
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 1);
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 4);
-//
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 7);
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 2);
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 5);
-//	SetColorPermutation(nrow, colors, permutation, permutationOpposite, newIndex, numberOfColors, 8);
 	std::cout << "Optimizing 4" << std::endl;
 
 	A.optimizationData = permutation;

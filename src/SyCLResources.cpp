@@ -4,13 +4,16 @@
 #include <map>
 #include "SyCLResources.h"
 
-cl::sycl::gpu_selector neo;
+cl::sycl::gpu_selector gpu;
 cl::sycl::cpu_selector cpu;
 
 cl::sycl::property_list propList{cl::sycl::property::queue::enable_profiling()};
 //sycl::queue queue(neo,propList);
-sycl::queue queue(neo);
-
+#ifdef SyCL_CPU
+sycl::queue queue(cpu);
+#else
+sycl::queue queue(gpu);
+#endif
 std::map<int, double *> dotProductArrays;
 
 BufferFactory bufferFactory;

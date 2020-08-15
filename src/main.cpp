@@ -184,7 +184,7 @@ int main(int argc, char *argv[]) {
 	// First load vector with random values
 	FillRandomVector(x_overlap);
 
-	int numberOfCalls = 1;
+	int numberOfCalls = 10;
 	if (quickPath) numberOfCalls = 1; //QuickPath means we do on one call of each block of repetitive code
 	double t_begin = mytimer();
 	for (int i = 0; i < numberOfCalls; ++i) {
@@ -252,12 +252,11 @@ int main(int argc, char *argv[]) {
 #endif
 	TestCGData testcg_data;
 	testcg_data.count_pass = testcg_data.count_fail = 0;
-	doAccess=true;//Synchronise at the end of each kernel
 	TestCG(A, data, b, x, testcg_data);
 
 	TestSymmetryData testsymmetry_data;
 	TestSymmetry(A, b, xexact, testsymmetry_data);
-	doAccess= false;//Stop synchronise at the end of each kernel
+
 	std::cout << "Yes?\n";
 
 #ifdef HPCG_DEBUG
@@ -286,6 +285,7 @@ int main(int argc, char *argv[]) {
 //	cl::sycl::property_list propList{cl::sycl::property::queue::enable_profiling()};
 //	queue=sycl::queue(neo,propList);
 	transpose= true;
+	quickPath= false;
 //	{
 ////		queue.
 ////		delete queue;

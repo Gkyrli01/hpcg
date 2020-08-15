@@ -145,7 +145,7 @@ inline void SyCLZeroVector(Vector_STRUCT &x) {
 	{
 
 		queue.submit([&](sycl::handler &cgh) {
-			auto x_acc = x_buf.get_access<sycl::access::mode::discard_write>(cgh);
+			auto x_acc = x_buf.get_access<sycl::access::mode::write>(cgh);
 			cgh.parallel_for<class zero>(
 					sycl::nd_range<1>(size, 32),
 					[=](sycl::nd_item<1> item) {

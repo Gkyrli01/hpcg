@@ -30,6 +30,9 @@
 #include "ComputeSYMGS_ref.hpp"
 #include <cassert>
 #include <iostream>
+#ifndef SYMGSSIZE
+#define SYMGSSIZE 32
+#endif
 
 /*!
   Computes one step of symmetric Gauss-Seidel:
@@ -129,9 +132,9 @@ int ComputeSYMGS_SyCL(SparseMatrix &A, const Vector &r, Vector &x) {
 								}
 							});
 				} else {
-					if (goEasyOnFwd&&currentColor<8) {
+					if (goEasyOnFwd&&currentColor<allcolors) {
 						cgh.parallel_for<class symgsTranposedFwD>(
-								sycl::nd_range<1>(items, 64),
+								sycl::nd_range<1>(items, SYMGSSIZE),
 								[=](sycl::nd_item<1> item) {
 									if (item.get_global_linear_id() < items) {
 										unsigned long i = item.get_global_linear_id() + offset;
@@ -160,7 +163,7 @@ int ComputeSYMGS_SyCL(SparseMatrix &A, const Vector &r, Vector &x) {
 								});
 					} else {
 						cgh.parallel_for<class symgsTranposed>(
-								sycl::nd_range<1>(items, 64),
+								sycl::nd_range<1>(items, SYMGSSIZE),
 								[=](sycl::nd_item<1> item) {
 									if (item.get_global_linear_id() < items) {
 										unsigned long i = item.get_global_linear_id() + offset;
