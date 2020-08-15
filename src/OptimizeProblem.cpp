@@ -310,13 +310,17 @@ int ReorderAll(SparseMatrix &A, CGData &data, Vector &b, Vector &x, Vector &xexa
 	}
 //	usleep(2000000);
 
-	PermuteMatrix(A.matrixValuesBT, permutation, A.localNumberOfRows, A.nonzerosInRow);
+	PermuteMatrix(A.matrixValuesBT, permutation, A.localNumberOfRows, A.nonzerosInRow, true);
 	{
 		auto a = A.matrixValuesBT.get_access<sycl::access::mode::read>();
 	}
+	PermuteMatrix(A.matrixValuesB, permutation, A.localNumberOfRows, A.nonzerosInRow, false);
+	{
+		auto a = A.matrixValuesB.get_access<sycl::access::mode::read>();
+	}
 //	usleep(1000000);
 
-	PermuteMatrixAndContents(A.mtxIndLBT, permutation, A.localNumberOfRows, A.nonzerosInRow, A.matrixValuesBT);
+	PermuteMatrixAndContents(A.mtxIndLBT, permutation, A.localNumberOfRows, A.nonzerosInRow, A.matrixValuesBT,true);
 	{
 		auto a = A.mtxIndLBT.get_access<sycl::access::mode::read>();
 		auto c = A.nonzerosInRow.get_access<sycl::access::mode::read>();
@@ -329,9 +333,8 @@ int ReorderAll(SparseMatrix &A, CGData &data, Vector &b, Vector &x, Vector &xexa
 			std::cout << a[i][1001] << " ";
 
 		}
-
-
 	}
+	PermuteMatrixAndContents(A.mtxIndLB, permutation, A.localNumberOfRows, A.nonzerosInRow, A.matrixValuesB, false);
 
 
 	PermuteVector(A.nonzerosInRow, permutation, A.localNumberOfRows);

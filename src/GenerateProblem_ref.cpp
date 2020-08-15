@@ -287,7 +287,7 @@ void GenerateProblem_ref(SparseMatrix &A, Vector *b, Vector *x, Vector *xexact) 
 //			auto mtxIndL_acc = mtxIndL_buf.get_access<sycl::access::mode::read>(cgh);
 //			auto mtxIndLNew_acc = mtxIndL2_buf.get_access<sycl::access::mode::write>(cgh);
 //
-//			cgh.parallel_for<class transpose>(
+//			cgh.parallel_for<class using_reordering>(
 //					sycl::nd_range<1>(rows * 32, 32),
 //					[=](sycl::nd_item<1> item) {
 //						int j = item.get_local_id();

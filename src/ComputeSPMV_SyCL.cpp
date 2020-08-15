@@ -53,7 +53,7 @@ void ThreadPerRowSpMV(sycl::queue &queue, sycl::buffer<double, 2> &matrixbuf, sy
 					 auto nonZeros = nonzerosinrowBuf.get_access<sycl::access::mode::read>(cgh);
 					 auto xvAccessor = xBuf.get_access<sycl::access::mode::read>(cgh);
 					 auto results = groups.get_access<sycl::access::mode::discard_write>(cgh);
-					 if (!transpose)
+					 if (!using_reordering)
 						 cgh.parallel_for<class spmv_kernel>(
 								 sycl::nd_range<1>(rows, wgroup_size),
 								 [=](sycl::nd_item<1> item) {
@@ -71,7 +71,13 @@ void ThreadPerRowSpMV(sycl::queue &queue, sycl::buffer<double, 2> &matrixbuf, sy
 									 size_t globalLinearId = item.get_global_linear_id();
 									 double sum = 0;
 									 for (int i = 0; i < nonZeros[globalLinearId]; ++i) {
+#ifdef TRANSPOSE
 										 sum += matrixMem[i][globalLinearId] * xvAccessor[mtxIndLMem[i][globalLinearId]];
+#else
+										 sum += matrixMem[globalLinearId][i] * xvAccessor[mtxIndLMem[globalLinearId][i]];
+#endif
+
+
 									 }
 									 results[globalLinearId] = sum;
 								 });
@@ -114,9 +120,11 @@ int ComputeSPMV_SyCL(const SparseMatrix &A, Vector &x, Vector &y) {
 	auto groups = y.buf;
 	auto mtxIndLbuf = A.mtxIndLB;
 	auto matrixbuf = A.matrixValuesB;
-	if (transpose) {
+	if(using_reordering) {
+#ifdef TRANSPOSE
 		matrixbuf = A.matrixValuesBT;
 		mtxIndLbuf = A.mtxIndLBT;
+#endif
 	}
 	auto xBuf = x.buf;
 	auto nonzerosinrowBuf = A.nonzerosInRow;

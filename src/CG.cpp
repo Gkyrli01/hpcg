@@ -57,7 +57,7 @@
 
   @see CG_ref()
 */
-int CG( SparseMatrix &A, CGData &data, const Vector &b, Vector &x,
+int CG(SparseMatrix &A, CGData &data, const Vector &b, Vector &x,
 	   const int max_iter, const double tolerance, int &niters, double &normr, double &normr0,
 	   double *times, bool doPreconditioning) {
 
@@ -107,15 +107,12 @@ int CG( SparseMatrix &A, CGData &data, const Vector &b, Vector &x,
 
 	// Record initial residual for convergence testing
 	normr0 = normr;
-
 	// Start iterations
-	bool didMG = false;
 	for (int k = 1; k <= max_iter && normr / normr0 > tolerance; k++) {
 
 		TICK();
 		if (doPreconditioning) {
-			if(!didMG)
-				ComputeMG(A, r, z); // Apply preconditioner
+			ComputeMG(A, r, z); // Apply preconditioner
 		} else
 			SyCLCopyVector(r, z); // copy r to z (no preconditioning)
 		TOCK(t5); // Preconditioner apply time
@@ -125,7 +122,7 @@ int CG( SparseMatrix &A, CGData &data, const Vector &b, Vector &x,
 			ComputeWAXPBY(nrow, 1.0, z, 0.0, z, p, A.isWaxpbyOptimized);
 			TOCK(t2); // Copy Mr to p
 			TICK();
-			std::cout<<"The dot\n";
+			std::cout << "The dot\n";
 			ComputeDotProduct(nrow, r, z, rtz, t4, A.isDotProductOptimized);
 			TOCK(t1); // rtz = r'*z
 		} else {
@@ -150,11 +147,6 @@ int CG( SparseMatrix &A, CGData &data, const Vector &b, Vector &x,
 		ComputeWAXPBY(nrow, 1.0, x, alpha, p, x, A.isWaxpbyOptimized);// x = x + alpha*p
 		ComputeWAXPBY(nrow, 1.0, r, -alpha, Ap, r, A.isWaxpbyOptimized);
 		TOCK(t2);// r = r - alpha*Ap
-
-//		if(transpose&&k<50){
-//			ComputeMG(A, r, z);
-//			didMG=true;
-//		} else
 		TICK();
 		ComputeDotProduct(nrow, r, r, normr, t4, A.isDotProductOptimized);
 		TOCK(t1);

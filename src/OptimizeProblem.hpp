@@ -119,8 +119,13 @@ PermuteFine2Coarse(sycl::buffer<local_int_t, 1> &buf, local_int_t *permutation, 
 //}
 
 template<typename T>
-inline void PermuteMatrix(sycl::buffer<T, 2> &buf, local_int_t *permutation, int len,sycl::buffer<char , 1> &nonzeros) {
-	auto nbuf = sycl::buffer<T, 2>(sycl::range<2>(27, len));
+inline void PermuteMatrix(sycl::buffer<T, 2> &buf, local_int_t *permutation, int len,sycl::buffer<char , 1> &nonzeros,bool transposed) {
+	local_int_t dim0=transposed?27:len;
+	local_int_t dim1=!transposed?27:len;
+
+	std::cout<< dim0<<" Dim0 |"<<dim1<< "Dim1\n";
+
+	auto nbuf = sycl::buffer<T, 2>(sycl::range<2>(dim0, dim1));
 	{
 		auto permutation_buf = *(bufferFactory.GetBuffer(permutation, sycl::range<1>(len)));
 		queue.submit([&](sycl::handler &cgh) {
@@ -136,10 +141,17 @@ inline void PermuteMatrix(sycl::buffer<T, 2> &buf, local_int_t *permutation, int
 						if (z < len) {
 							auto i = permutation_acc[z];
 							for (int j = 0; j < 27; ++j) {
-								if(j<nonzeros_acc[z])
-									reordered[j][i] = bufAcc[j][z];
-								else
-									reordered[j][i]=0;
+								if(transposed) {
+									if (j < nonzeros_acc[z])
+										reordered[j][i] = bufAcc[j][z];
+									else
+										reordered[j][i] = 0;
+								} else{
+									if (j < nonzeros_acc[z])
+										reordered[i][j] = bufAcc[z][j];
+									else
+										reordered[i][j] = 0;
+								}
 							}
 						}
 					});
@@ -147,17 +159,18 @@ inline void PermuteMatrix(sycl::buffer<T, 2> &buf, local_int_t *permutation, int
 		});
 	}
 	auto a=nbuf.template get_access<sycl::access::mode::read>();
-////	buf= 0;
-//	buf.set_write_back(false);
-//	buf.set_final_data(nullptr);
-
 	buf = nbuf;
 }
 
+
+
 template<typename T>
-inline void PermuteMatrixAndContents(sycl::buffer<T, 2> &buf,local_int_t *permutation, int len,sycl::buffer<char , 1> &nonzeros,sycl::buffer<double , 2> &matrixValues) {
-	auto nbuf = sycl::buffer<T, 2>(sycl::range<2>(27, len));
-	{
+inline void PermuteMatrixAndContents(sycl::buffer<T, 2> &buf,local_int_t *permutation, int len,sycl::buffer<char , 1> &nonzeros,sycl::buffer<double , 2> &matrixValues,bool transposed) {
+	local_int_t dim0=transposed?27:len;
+	local_int_t dim1=!transposed?27:len;
+	std::cout<< dim0<<" Dim0 |"<<dim1<< "Dim1\n";
+
+	auto nbuf = sycl::buffer<T, 2>(sycl::range<2>(dim0, dim1));	{
 		auto permutation_buf = *(bufferFactory.GetBuffer(permutation, sycl::range<1>(len)));
 		queue.submit([&](sycl::handler &cgh) {
 			auto bufAcc = buf.template get_access<sycl::access::mode::read>(cgh);
@@ -173,21 +186,39 @@ inline void PermuteMatrixAndContents(sycl::buffer<T, 2> &buf,local_int_t *permut
 						if (z < len) {
 							auto i = permutation_acc[z];
 							for (int j = 0; j < 27; ++j) {
-								if(j<nonzeros_acc[z])
-									reordered[j][i] = permutation_acc[bufAcc[j][z]];
-								else
-									reordered[j][i] = 0;
+								if(transposed) {
+									if (j < nonzeros_acc[z])
+										reordered[j][i] = permutation_acc[bufAcc[j][z]];
+									else
+										reordered[j][i] = 0;
+								} else{
+									if (j < nonzeros_acc[z])
+										reordered[i][j] = permutation_acc[bufAcc[z][j]];
+									else
+										reordered[i][j] = 0;
+								}
 							}
 							char nonzeroes=nonzeros_acc[z];
 							for (int k = 0; k < nonzeroes; ++k) {
 								for (int j = k+1; j < nonzeroes; ++j) {
-									if(reordered[k][i]>reordered[j][i]){
-										auto tmp=reordered[k][i];
-										auto tmp2=reorderValues[k][i];
-										reordered[k][i]=reordered[j][i];
-										reorderValues[k][i]=reorderValues[j][i];
-										reordered[j][i]=tmp;
-										reorderValues[j][i]=tmp2;
+									if(transposed) {
+										if (reordered[k][i] > reordered[j][i]) {
+											auto tmp = reordered[k][i];
+											auto tmp2 = reorderValues[k][i];
+											reordered[k][i] = reordered[j][i];
+											reorderValues[k][i] = reorderValues[j][i];
+											reordered[j][i] = tmp;
+											reorderValues[j][i] = tmp2;
+										}
+									} else{
+										if (reordered[i][k] > reordered[i][j]) {
+											auto tmp = reordered[i][k];
+											auto tmp2 = reorderValues[i][k];
+											reordered[i][k] = reordered[i][j];
+											reorderValues[i][k] = reorderValues[i][j];
+											reordered[i][j] = tmp;
+											reorderValues[i][j] = tmp2;
+										}
 									}
 								}
 							}

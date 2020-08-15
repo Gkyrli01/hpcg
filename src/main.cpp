@@ -284,14 +284,14 @@ int main(int argc, char *argv[]) {
 	std::vector<double> opt_times(9, 0.0);
 //	cl::sycl::property_list propList{cl::sycl::property::queue::enable_profiling()};
 //	queue=sycl::queue(neo,propList);
-	transpose= true;
+	using_reordering= true;
 	quickPath= false;
 //	{
 ////		queue.
 ////		delete queue;
 //		queue = sycl::queue(neo);
 //	}
-	if(transpose) {
+	if(using_reordering) {
 		ReorderAll(A, data, b, x, xexact, 1);
 	}
 	std::cout<<"Exits\n";
@@ -351,7 +351,7 @@ int main(int argc, char *argv[]) {
 	testnorms_data.samples = numberOfCgSets;
 	testnorms_data.values = new double[numberOfCgSets];
 	std::cout << "preimplement" << endl;
-//	transpose= false;
+//	using_reordering= false;
 
 	doAccess = false;
 	for (int i = 0; i < numberOfCgSets; ++i) {

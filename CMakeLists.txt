@@ -15,21 +15,22 @@ add_definitions(-DSyCL_SYMGS)
 ##Dont change end
 
 add_definitions(-DHPCG_NO_OPENMP)
-#Comment out if you want to run on the gpu
-#add_definitions(-DSyCL_CPU)
-add_definitions(-DHPCG_DEBUG)
+add_definitions(-DSyCL_CPU)#Comment out if you want to run on the gpu
+#add_definitions(-DTRANSPOSE)#Comment out if you do not want to use transposed 2D arrays (Transpose for GPUs)
+
+#add_definitions(-DHPCG_DEBUG)
 set(CMAKE_MODULE_PATH ~/Desktop/ccppsdk/cmake/Modules/)
 set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS})
 set(CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS})
 get_directory_property(MYDEFS COMPILE_DEFINITIONS)
 if(MYDEFS MATCHES "SyCL_CPU")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsycl -Ofast")
-    add_definitions(-DSYMGSSIZE=48)
+    add_definitions(-DSYMGSSIZE=36)
     add_definitions(-DSPMVSIZE=36)
 else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -ffast-math -fsycl -fsycl-targets=nvptx64-nvidia-cuda-sycldevice -Ofast")
-    add_definitions(-DSYMGSSIZE=256)
-    add_definitions(-DSPMVSIZE=256)
+    add_definitions(-DSYMGSSIZE=768)
+    add_definitions(-DSPMVSIZE=512)
 endif()
 
 include_directories(src)
@@ -137,26 +138,6 @@ add_executable(sycli
         src/SyCLResources.cpp)
 
 target_link_libraries(sycli ${MPI_LIBRARIES})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #include(FindComputeCpp)
 #set(CMAKE_CXX_COMPILE_FLAGS ${CMAKE_CXX_COMPILE_FLAGS} ${MPI_COMPILE_FLAGS} -fopenmp)
