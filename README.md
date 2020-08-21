@@ -4,7 +4,43 @@
 
 A SyCL port of HPCG, using DPC++ compiler. 
 
-The implementation will change the OpenMP kernels to SyCL kernels.
+The implementation ports the reference kernels to SyCL kernels.
+
+## Requirements
+
+- DPC++ compiler ([Installation guide](https://github.com/intel/llvm/blob/sycl/sycl/doc/GetStartedGuide.md))
+
+## Compilation
+
+```
+git clone https://github.com/Gkyrli01/hpcg.git
+mkdir build
+cd build
+cmake ..
+make -j
+./sycli 128 128 128 or any other problem size
+```
+During the cmake command make sure that the CXX compiler used is the DPC++ one.
+Try using:
+
+```
+cmake .. -D CMAKE_CXX_COMPILER=clang++
+```
+
+## Tuning implementation
+
+Modify the CMakeList definitions to adapt the implementation to the target software.
+
+- Enable SyCL_CPU to run implementation on CPUs
+- Enable TRANSPOSE to modify data layout of the arrays
+- Modify SYMGSSIZE value to adjust the size of workgroups for SYMGS kernel
+- Modify SPMVSIZE value to adjust the size of workgroups for SPMV kernel
+
+## Testing
+
+The testing process is integrated in the benchmark. A report is generated reporting
+the test results along with performance results.
+
 
 
 ########################################################
