@@ -1,5 +1,5 @@
 ###################################################################
-# High Performance Conjugate Gradient Benchmark (HPCG) using SyCL #
+# SyCL port of HPCG#
 ###################################################################
 
 A SyCL port of HPCG, using DPC++ compiler. 
