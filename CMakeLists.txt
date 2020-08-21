@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(hpcg)
 
 set(CMAKE_CXX_STANDARD 11)
-find_package(MPI REQUIRED)
+#find_package(MPI REQUIRED)
 include_directories(${MPI_INCLUDE_PATH})
 
 #Dont change
@@ -13,7 +13,7 @@ add_definitions(-DSyCL_WAXPBY)
 add_definitions(-DSyCL_DOT)
 add_definitions(-DSyCL_SYMGS)
 ##Dont change end
-
+add_definitions(-DHPCG_NO_MPI)
 add_definitions(-DHPCG_NO_OPENMP)
 add_definitions(-DSyCL_CPU)#Comment out if you want to run on the gpu
 #add_definitions(-DTRANSPOSE)#Comment out if you do not want to use transposed 2D arrays (Transpose for GPUs)
